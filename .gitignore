@@ -1,28 +1,25 @@
-# --- CARPETAS DE DOCKER (¡IMPORTANTE!) ---
+# --- DOCKER & DB (CRÍTICO) ---
 mysql_data/
 backups/
 
-# --- DEPENDENCIAS (Librerías pesadas) ---
-frontend/node_modules/
-backend/node_modules/
+# --- LARAVEL (BACKEND) ---
 backend/vendor/
-
-# --- ARCHIVOS DE ENTORNO (Claves secretas) ---
-.env
+backend/node_modules/
 backend/.env
-
-# --- EDITOR DE CÓDIGO ---
-.vscode/
-.idea/
-.DS_Store
-
-# --- ARCHIVOS DE LARAVEL GENERADOS ---
 backend/storage/*.key
 backend/storage/logs/*
 backend/storage/framework/cache/*
 backend/storage/framework/sessions/*
 backend/storage/framework/views/*
-
-# --- ARCHIVOS PUBLICOS (Ignorar los PDFs reales de clientes) ---
 backend/storage/app/public/*
 !backend/storage/app/public/.gitignore
+
+# --- ANGULAR (FRONTEND) ---
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# --- GENERAL ---
+.vscode/
+.idea/
+.DS_Store
