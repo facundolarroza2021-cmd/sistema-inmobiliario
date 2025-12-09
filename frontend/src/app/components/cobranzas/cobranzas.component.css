@@ -1,0 +1,20 @@
+table {
+    width: 100%;
+}
+
+th.mat-header-cell {
+    background-color: #fafafa;
+    color: #555;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+tr.mat-row:hover {
+    background-color: #f1f8e9; /* Verde muy suave al pasar el mouse (psicología del dinero) */
+}
+
+/* Ajuste visual para el botón de cobrar */
+button mat-icon {
+    margin-right: 5px;
+}

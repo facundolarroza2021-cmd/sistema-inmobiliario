@@ -1,0 +1,57 @@
+<h2 mat-dialog-title style="background: #4caf50; color: white;">
+    <mat-icon style="vertical-align: middle; margin-right: 10px;">payments</mat-icon>
+    Finalizar Cobro
+  </h2>
+  
+  <mat-dialog-content style="padding-top: 20px; min-width: 400px;">
+    
+    <div style="background: #f1f8e9; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+    
+        <h3 style="margin: 0 0 10px 0; color: #555;">Monto a Cobrar</h3>
+        
+        <div style="display: flex; align-items: center; justify-content: center; gap: 5px;">
+            <span style="font-size: 2rem; color: #2e7d32; font-weight: bold;">$</span>
+            <input type="number" 
+                   [(ngModel)]="data.total" 
+                   style="font-size: 2rem; color: #2e7d32; font-weight: bold; border: none; background: transparent; width: 150px; text-align: center; border-bottom: 2px solid #2e7d32; outline: none;">
+        </div>
+    
+        <small style="color: #666; display: block; margin-top: 10px;">
+            {{ data.cantidad }} cuotas seleccionadas
+        </small>
+        
+        <div *ngIf="data.total < totalOriginal" style="color: #e65100; font-size: 12px; margin-top: 5px; font-weight: bold;">
+            ⚠️ Pago Parcial: Quedará deuda pendiente.
+        </div>
+    
+    </div>
+  
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Forma de Pago</mat-label>
+        <mat-select [(ngModel)]="seleccion.forma_pago">
+          <mat-option value="EFECTIVO">Efectivo</mat-option>
+          <mat-option value="TRANSFERENCIA">Transferencia Bancaria</mat-option>
+          <mat-option value="DEPOSITO">Depósito</mat-option>
+          <mat-option value="CHEQUE">Cheque</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>account_balance_wallet</mat-icon>
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Observaciones / Notas (Opcional)</mat-label>
+        <textarea matInput [(ngModel)]="seleccion.observacion" rows="3" placeholder="Ej: Pago realizado por un tercero..."></textarea>
+        <mat-icon matSuffix>edit_note</mat-icon>
+      </mat-form-field>
+  
+    </div>
+  
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end" style="padding: 15px;">
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button mat-raised-button color="primary" style="background-color: #4caf50;" (click)="confirmar()">
+      <mat-icon>check</mat-icon> Confirmar Pago
+    </button>
+  </mat-dialog-actions>

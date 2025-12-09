@@ -1,0 +1,116 @@
+<div class="dashboard-container">
+  
+    <div style="margin-bottom: 25px;">
+      <h1 style="margin: 0; color: #2c3e50; font-weight: 500;">Panel de Control</h1>
+      <p style="margin: 0; color: #7f8c8d;">Resumen de la situación actual de la inmobiliaria</p>
+    </div>
+  
+    <div class="kpi-grid">
+      
+      <mat-card class="kpi-card">
+        <div class="icon-bg azul">
+          <mat-icon>domain</mat-icon>
+        </div>
+        <div>
+          <div class="kpi-value">{{ data.total_propiedades }}</div>
+          <div class="kpi-label">Propiedades</div>
+        </div>
+      </mat-card>
+  
+      <mat-card class="kpi-card">
+        <div class="icon-bg verde">
+          <mat-icon>assignment_turned_in</mat-icon>
+        </div>
+        <div>
+          <div class="kpi-value">{{ data.contratos_activos }}</div>
+          <div class="kpi-label">Contratos Activos</div>
+        </div>
+      </mat-card>
+  
+      <mat-card class="kpi-card">
+        <div class="icon-bg amarillo">
+          <mat-icon>attach_money</mat-icon>
+        </div>
+        <div>
+          <div class="kpi-value">$ {{ data.recaudado_mes | number:'1.0-0' }}</div>
+          <div class="kpi-label">Ingresos del Mes</div>
+        </div>
+      </mat-card>
+  
+      <mat-card class="kpi-card">
+        <div class="icon-bg rojo">
+          <mat-icon>money_off</mat-icon>
+        </div>
+        <div>
+          <div class="kpi-value">$ {{ data.deuda_pendiente | number:'1.0-0' }}</div>
+          <div class="kpi-label">Por Cobrar</div>
+        </div>
+      </mat-card>
+    </div>
+  
+    <div class="content-grid">
+      
+      <mat-card class="section-card">
+        <mat-card-header>
+          <mat-card-title style="font-size: 1.1rem; display: flex; align-items: center; gap: 10px;">
+            <mat-icon style="color: #e65100;">warning</mat-icon> 
+            Vencimientos Próximos (30 días)
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          
+          <mat-list *ngIf="data.proximos_vencimientos.length > 0; else sinAlertas">
+            <mat-list-item *ngFor="let c of data.proximos_vencimientos">
+              <mat-icon matListItemIcon>event_busy</mat-icon>
+              <div matListItemTitle>{{ c.inquilino.nombre_completo }}</div>
+              <div matListItemLine>Vence el: <strong>{{ c.fecha_fin }}</strong></div>
+              <div matListItemLine style="font-size: 11px; color: #666;">{{ c.propiedad.direccion }}</div>
+            </mat-list-item>
+          </mat-list>
+  
+          <ng-template #sinAlertas>
+            <div class="empty-state">
+              <mat-icon>check_circle</mat-icon>
+              <p>Tranquilidad: No hay contratos por vencer pronto.</p>
+            </div>
+          </ng-template>
+  
+        </mat-card-content>
+      </mat-card>
+  
+  
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <mat-card class="section-card">
+          <mat-card-header>
+            <mat-card-title style="font-size: 1rem;">Accesos Rápidos</mat-card-title>
+          </mat-card-header>
+          <mat-card-content style="padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button mat-flat-button color="primary" routerLink="/cobranzas">
+                  <mat-icon>point_of_sale</mat-icon> Ir a Caja
+              </button>
+              <button mat-stroked-button color="primary" routerLink="/contratos">
+                  <mat-icon>add</mat-icon> Contrato
+              </button>
+          </mat-card-content>
+        </mat-card>
+  
+        <mat-card class="section-card" style="flex: 1;">
+          <mat-card-header>
+            <mat-card-title style="font-size: 1rem;">Últimos Cobros</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-list>
+              <mat-list-item *ngFor="let p of data.ultimos_pagos">
+                  <mat-icon matListItemIcon style="color: green;">payments</mat-icon>
+                  <div matListItemTitle>+ $ {{ p.monto_pagado }}</div>
+                  <div matListItemLine style="font-size: 11px;">{{ p.cuota?.contrato?.inquilino?.nombre_completo }}</div>
+              </mat-list-item>
+            </mat-list>
+          </mat-card-content>
+        </mat-card>
+  
+      </div>
+  
+    </div>
+  </div>

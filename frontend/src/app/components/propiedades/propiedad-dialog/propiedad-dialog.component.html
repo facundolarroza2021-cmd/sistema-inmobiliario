@@ -1,0 +1,47 @@
+<h2 mat-dialog-title style="background: #3f51b5; color: white; display: flex; align-items: center; gap: 10px;">
+    <mat-icon>home_work</mat-icon>
+    Nueva Propiedad
+  </h2>
+  
+  <mat-dialog-content style="padding-top: 20px; min-width: 400px;">
+    
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Propietario</mat-label>
+        <mat-select [(ngModel)]="nuevaPropiedad.propietario_id">
+          <mat-option *ngFor="let p of listaPropietarios" [value]="p.id">
+            {{ p.nombre_completo }} (DNI: {{p.dni}})
+          </mat-option>
+        </mat-select>
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Dirección</mat-label>
+        <input matInput [(ngModel)]="nuevaPropiedad.direccion" placeholder="Calle y Altura">
+        <mat-icon matSuffix>place</mat-icon>
+      </mat-form-field>
+  
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <mat-form-field appearance="outline">
+              <mat-label>Tipo</mat-label>
+              <input matInput [(ngModel)]="nuevaPropiedad.tipo" placeholder="Ej: Depto 2 Amb">
+              <mat-icon matSuffix>apartment</mat-icon>
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline">
+              <mat-label>Comisión (%)</mat-label>
+              <input matInput type="number" [(ngModel)]="nuevaPropiedad.comision">
+              <mat-icon matSuffix>percent</mat-icon>
+          </mat-form-field>
+      </div>
+  
+    </div>
+  
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end" style="padding: 15px;">
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button mat-raised-button color="primary" (click)="guardar()">Guardar</button>
+  </mat-dialog-actions>

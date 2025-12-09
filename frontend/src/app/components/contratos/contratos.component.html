@@ -1,0 +1,71 @@
+<div class="container-fluid" style="padding: 20px;">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <div>
+        <h1 style="margin: 0; font-weight: 500;">Contratos de Alquiler</h1>
+        <small style="color: #666;">Administración de contratos vigentes e históricos</small>
+      </div>
+  
+      <button mat-raised-button color="primary" (click)="nuevoContrato()" style="background-color: #4caf50;">
+        <mat-icon>add</mat-icon> Nuevo Contrato
+      </button>
+    </div>
+  
+    <mat-form-field appearance="outline" style="width: 100%;">
+      <mat-label>Buscar por Inquilino o Dirección...</mat-label>
+      <input matInput (keyup)="aplicarFiltro($event)">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  
+    <div class="mat-elevation-z2" style="border-radius: 8px; overflow: hidden; background: white;">
+        <table mat-table [dataSource]="dataSource" matSort>
+
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+              <td mat-cell *matCellDef="let element"> #{{element.id}} </td>
+            </ng-container>
+      
+            <ng-container matColumnDef="propiedad">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Propiedad </th>
+              <td mat-cell *matCellDef="let element"> {{element.propiedad?.direccion || 'No asignada'}} </td>
+            </ng-container>
+      
+            <ng-container matColumnDef="inquilino">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header> Inquilino </th>
+              <td mat-cell *matCellDef="let element"> 
+                  <strong>{{element.inquilino?.nombre_completo || 'No asignado'}}</strong> 
+              </td>
+            </ng-container>
+      
+            <ng-container matColumnDef="vigencia">
+              <th mat-header-cell *matHeaderCellDef> Vigencia </th>
+              <td mat-cell *matCellDef="let element"> 
+                  {{element.fecha_inicio}} -> {{element.fecha_fin}}
+              </td>
+            </ng-container>
+      
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef> Estado </th>
+              <td mat-cell *matCellDef="let element"> 
+                  <mat-chip [style.background-color]="element.activo ? '#e8f5e9' : '#eceff1'" 
+                            [style.color]="element.activo ? '#2e7d32' : '#546e7a'">
+                      {{ element.activo ? 'VIGENTE' : 'FINALIZADO' }}
+                  </mat-chip>
+              </td>
+            </ng-container>
+      
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef> </th>
+              <td mat-cell *matCellDef="let element" style="text-align: right;">
+                  <button mat-icon-button color="primary" (click)="verDetalle(element)">
+                      <mat-icon>visibility</mat-icon>
+                  </button>
+              </td>
+            </ng-container>
+      
+            <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+            <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+          </table>
+      <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons></mat-paginator>
+    </div>
+  </div>

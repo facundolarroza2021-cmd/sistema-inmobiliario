@@ -1,0 +1,141 @@
+<div class="container-fluid" style="padding: 20px;" *ngIf="propiedad">
+
+    <div class="header-card mat-elevation-z2">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+          <div class="badge-tipo">{{ propiedad.tipo }}</div>
+          <h1 style="margin: 10px 0 5px 0; font-size: 2rem; color: #263238;">{{ propiedad.direccion }}</h1>
+          <p style="color: #78909c; display: flex; align-items: center; gap: 5px;">
+             <mat-icon>person</mat-icon> Dueño: <strong>{{ propiedad.propietario.nombre_completo }}</strong>
+          </p>
+        </div>
+        
+        <div [class]="propiedad.contrato_activo ? 'estado-ocupado' : 'estado-libre'">
+          {{ propiedad.contrato_activo ? 'ALQUILADA' : 'DISPONIBLE' }}
+        </div>
+      </div>
+    </div>
+  
+    <mat-card style="margin-top: 20px; border-radius: 12px;">
+      <mat-tab-group>
+        
+        <mat-tab label="Galería de Fotos">
+          <div style="padding: 20px;">
+              
+              <div style="margin-bottom: 20px;">
+                  <input type="file" #fileInput style="display: none" (change)="subirFoto($event)" accept="image/*">
+                  <button mat-raised-button color="primary" (click)="fileInput.click()">
+                      <mat-icon>add_a_photo</mat-icon> Agregar Foto
+                  </button>
+              </div>
+  
+              <div class="gallery-grid" *ngIf="propiedad.imagenes?.length > 0; else sinFotos">
+                  <div class="photo-card" *ngFor="let img of propiedad.imagenes">
+                      <img [src]="img.url" alt="Foto Propiedad">
+                  </div>
+              </div>
+  
+              <ng-template #sinFotos>
+                  <div style="text-align: center; padding: 40px; color: #999; border: 2px dashed #eee; border-radius: 10px;">
+                      <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.2;">image</mat-icon>
+                      <p>No hay fotos cargadas de esta propiedad.</p>
+                  </div>
+              </ng-template>
+  
+          </div>
+        </mat-tab>
+  
+        <mat-tab label="Historial de Inquilinos">
+          <div style="padding: 20px;">
+              <table style="width: 100%; text-align: left; border-collapse: collapse;">
+                  <tr style="border-bottom: 1px solid #eee; color: #999;">
+                      <th style="padding: 10px;">Inquilino</th>
+                      <th>Desde</th>
+                      <th>Hasta</th>
+                      <th>Estado</th>
+                  </tr>
+                  <tr *ngFor="let c of propiedad.contratos || []" style="border-bottom: 1px solid #f5f5f5;">
+                      <td style="padding: 15px 10px; font-weight: bold;">{{ c.inquilino.nombre_completo }}</td>
+                      <td>{{ c.fecha_inicio }}</td>
+                      <td>{{ c.fecha_fin }}</td>
+                      <td>
+                          <span [style.color]="c.activo ? 'green' : 'grey'">
+                              {{ c.activo ? 'VIGENTE' : 'FINALIZADO' }}
+                          </span>
+                      </td>
+                  </tr>
+              </table>
+          </div>
+        </mat-tab>
+        <mat-tab label="Gastos y Reparaciones">
+          <div style="padding: 20px;">
+              
+            <div style="display: flex; gap: 10px; align-items: center; background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+              <input type="date" [(ngModel)]="nuevoGasto.fecha" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+              
+              <input type="text" [(ngModel)]="nuevoGasto.concepto" placeholder="Ej: Plomero..." style="flex: 2; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+              
+              <select [(ngModel)]="nuevoGasto.responsable" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                  <option value="PROPIETARIO">A cargo del Propietario</option>
+                  <option value="INQUILINO">A cargo del Inquilino</option>
+                  <option value="INMOBILIARIA">Gasto Inmobiliaria</option>
+              </select>
+
+              <input type="number" [(ngModel)]="nuevoGasto.monto" placeholder="$ Monto" style="width: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+              
+              <button mat-raised-button color="warn" (click)="guardarGasto()">Cargar</button>
+          </div>
+
+          <table class="simple-table">
+              <thead>
+                  <tr>
+                      <th>Fecha</th>
+                      <th>Concepto</th>
+                      <th>Responsable</th> <th>Monto</th>
+                      <th>Estado</th>
+                      <th></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr *ngFor="let g of listaGastos">
+                      <td>{{ g.fecha | date:'dd/MM/yyyy' }}</td>
+                      <td>{{ g.concepto }}</td>
+                      
+                      <td>
+                          <span [ngStyle]="{
+                              'background': g.responsable === 'PROPIETARIO' ? '#e3f2fd' : (g.responsable === 'INQUILINO' ? '#fff3e0' : '#f5f5f5'),
+                              'color': g.responsable === 'PROPIETARIO' ? '#1565c0' : (g.responsable === 'INQUILINO' ? '#e65100' : '#666'),
+                              'padding': '4px 8px',
+                              'border-radius': '4px',
+                              'font-size': '11px',
+                              'font-weight': 'bold'
+                          }">
+                              {{ g.responsable }}
+                          </span>
+                      </td>
+
+                      <td style="color: #c62828; font-weight: bold;">- $ {{ g.monto }}</td>
+                      <td>
+                          <ng-container *ngIf="g.responsable === 'PROPIETARIO'">
+                              <span *ngIf="g.liquidacion_id" style="color: green; font-size: 11px;">✅ LIQUIDADO</span>
+                              <span *ngIf="!g.liquidacion_id" style="color: orange; font-size: 11px;">⏳ PENDIENTE</span>
+                          </ng-container>
+                          <span *ngIf="g.responsable !== 'PROPIETARIO'" style="color: #999; font-size: 11px;">NO LIQUIDABLE</span>
+                      </td>
+                      <td>
+                          <button *ngIf="!g.liquidacion_id" mat-icon-button color="warn" (click)="borrarGasto(g.id)">
+                              <mat-icon>delete</mat-icon>
+                          </button>
+                      </td>
+                  </tr>
+              </tbody>
+          </table>
+
+  
+          </div>
+        </mat-tab>
+  
+      </mat-tab-group>
+    </mat-card>
+  
+  </div>

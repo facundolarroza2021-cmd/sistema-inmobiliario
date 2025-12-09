@@ -1,0 +1,125 @@
+<div class="container-fluid" style="padding: 20px;" *ngIf="propietario">
+
+    <div class="profile-header mat-elevation-z2">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        
+        <div class="profile-avatar" [style.background-color]="getColorAvatar(propietario.id)">
+          {{ propietario.nombre_completo.charAt(0) }}
+        </div>
+  
+        <div>
+          <h1 style="margin: 0; color: #1a237e; font-size: 1.8rem;">{{ propietario.nombre_completo }}</h1>
+          <div style="display: flex; gap: 15px; margin-top: 5px; color: #555;">
+            <span><mat-icon style="font-size: 16px; width: 16px; vertical-align: middle;">badge</mat-icon> {{ propietario.dni }}</span>
+            <span><mat-icon style="font-size: 16px; width: 16px; vertical-align: middle;">email</mat-icon> {{ propietario.email }}</span>
+            <span><mat-icon style="font-size: 16px; width: 16px; vertical-align: middle;">phone</mat-icon> {{ propietario.telefono }}</span>
+          </div>
+        </div>
+      </div>
+  
+      <div style="display: flex; gap: 10px;">
+        <a mat-stroked-button color="primary" target="_blank" href="https://wa.me/549{{propietario.telefono}}">
+          <mat-icon>chat</mat-icon> WhatsApp
+        </a>
+        <button mat-flat-button color="primary">
+          <mat-icon>edit</mat-icon> Editar Datos
+        </button>
+      </div>
+    </div>
+  
+    <div class="kpi-grid">
+      <mat-card class="kpi-card">
+        <div class="kpi-label">Propiedades</div>
+        <div class="kpi-value">{{ kpis.total_propiedades }}</div>
+        <mat-icon class="kpi-icon" style="color: #3f51b5;">domain</mat-icon>
+      </mat-card>
+  
+      <mat-card class="kpi-card">
+        <div class="kpi-label">Alquiladas</div>
+        <div class="kpi-value">{{ kpis.ocupacion }}</div>
+        <mat-icon class="kpi-icon" style="color: #4caf50;">vpn_key</mat-icon>
+      </mat-card>
+  
+      <mat-card class="kpi-card">
+        <div class="kpi-label">Saldo Pendiente</div>
+        <div class="kpi-value" style="color: #c62828;">$ 0</div> <mat-icon class="kpi-icon" style="color: #ef5350;">account_balance_wallet</mat-icon>
+      </mat-card>
+    </div>
+  
+    <mat-card class="tabs-card">
+      <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+        
+        <mat-tab label="Propiedades">
+          <div style="padding: 20px;">
+            <table class="simple-table">
+              <thead>
+                <tr>
+                  <th>Dirección</th>
+                  <th>Tipo</th>
+                  <th>Estado</th>
+                  <th>Inquilino Actual</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of propietario.propiedades">
+                  <td><strong>{{ p.direccion }}</strong></td>
+                  <td>{{ p.tipo }}</td>
+                  <td>
+                    <span [class]="p.contrato_activo ? 'badge-ocupado' : 'badge-libre'">
+                      {{ p.contrato_activo ? 'ALQUILADO' : 'DISPONIBLE' }}
+                    </span>
+                  </td>
+                  <td>
+                      {{ p.contrato_activo?.inquilino?.nombre_completo || '-' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </mat-tab>
+  
+        <mat-tab label="Historial de Pagos">
+          <div style="padding: 20px;">
+              <div *ngIf="propietario.liquidaciones.length === 0" style="color: #999;">No hay pagos registrados aún.</div>
+              
+              <table class="simple-table" *ngIf="propietario.liquidaciones.length > 0">
+                  <thead>
+                      <tr>
+                          <th>Fecha</th>
+                          <th>Periodo</th>
+                          <th>Monto Entregado</th>
+                          <th></th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngFor="let liq of propietario.liquidaciones">
+                          <td>{{ liq.created_at | date:'dd/MM/yyyy' }}</td>
+                          <td>{{ liq.periodo }}</td>
+                          <td style="font-weight: bold; color: green;">$ {{ liq.monto_entregado }}</td>
+                          <td><mat-icon style="cursor: pointer; color: #666">picture_as_pdf</mat-icon></td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+        </mat-tab>
+  
+        <mat-tab label="Datos Bancarios">
+          <div style="padding: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div class="bank-card">
+                  <h3>Cuenta Bancaria</h3>
+                  <p><strong>CBU / CVU:</strong> <span style="font-family: monospace; font-size: 1.2em;">{{ propietario.cbu || 'No registrado' }}</span></p>
+                  <p><strong>Alias:</strong> - </p>
+                  <p><strong>Banco:</strong> - </p>
+              </div>
+              <div class="bank-card">
+                  <h3>Datos Fiscales</h3>
+                  <p><strong>DNI / CUIT:</strong> {{ propietario.dni }}</p>
+                  <p><strong>Domicilio:</strong> - </p>
+              </div>
+          </div>
+        </mat-tab>
+  
+      </mat-tab-group>
+    </mat-card>
+  
+  </div>

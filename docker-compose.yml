@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: inmo_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: inmobiliaria_db
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: inmo_api
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: inmo_web
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "4200:4200"
+
+  pma:
+    image: phpmyadmin/phpmyadmin
+    container_name: inmo_pma
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - db

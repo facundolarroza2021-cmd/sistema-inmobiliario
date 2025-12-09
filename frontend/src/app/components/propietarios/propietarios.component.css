@@ -1,0 +1,144 @@
+/* Cabecera */
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 25px;
+}
+
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a237e; /* Azul profundo elegante */
+    margin: 0;
+}
+
+.page-subtitle {
+    color: #7986cb;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.btn-nuevo {
+    background: linear-gradient(135deg, #3f51b5, #303f9f);
+    padding: 0 25px;
+    height: 45px;
+    border-radius: 25px; /* Botón redondeado moderno */
+    font-weight: 500;
+}
+
+/* Buscador Flotante (Estilo Google Material 3) */
+.search-bar-container {
+    background: white;
+    padding: 12px 20px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    max-width: 500px;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.search-bar-container:focus-within {
+    box-shadow: 0 6px 20px rgba(63, 81, 181, 0.15);
+    border-color: #3f51b5;
+}
+
+.search-bar-container input {
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    width: 100%;
+    color: #444;
+}
+
+.search-icon { color: #999; }
+
+/* Tabla Contenedor */
+.table-container {
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+/* Estilos de Celda */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 8px 0;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #888;
+}
+
+/* Fila Hover Effect */
+.hover-row {
+    transition: background-color 0.2s ease;
+    cursor: default;
+}
+
+.hover-row:hover {
+    background-color: #f8f9fa; /* Gris muy clarito */
+}
+
+/* Botones de Acción */
+.action-btn {
+    opacity: 0.6;
+    transition: all 0.2s;
+}
+
+.hover-row:hover .action-btn {
+    opacity: 1; /* Aparecen fuerte al pasar el mouse */
+}
+
+.btn-whatsapp {
+    opacity: 0.5;
+    transition: 0.2s;
+    filter: grayscale(100%);
+}
+
+.btn-whatsapp:hover {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: scale(1.1);
+}
+
+th.mat-header-cell {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #999;
+    font-weight: 600;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}

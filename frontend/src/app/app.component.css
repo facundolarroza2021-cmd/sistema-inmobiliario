@@ -1,0 +1,57 @@
+/* Que el contenedor ocupe toda la ventana */
+.sidenav-container {
+    height: 100vh; /* 100% del Viewport Height */
+    background-color: #f5f7fa; /* Un gris muy muy suave de fondo para toda la app */
+}
+
+/* Estilo de la barra lateral */
+.sidenav {
+    width: 250px;
+    background-color: white;
+    border-right: 1px solid rgba(0,0,0,0.08);
+}
+
+.sidenav-header {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    background-color: #3f51b5; /* Mismo color que el toolbar o uno más oscuro */
+    color: white;
+    gap: 10px;
+}
+
+.sidenav-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+/* Estilo para el link ACTIVO (donde estás parado) */
+.active-link {
+    background-color: #e8eaf6 !important; /* Azul muy clarito */
+    color: #3f51b5 !important; /* Texto azul */
+    border-left: 4px solid #3f51b5; /* Borde izquierdo indicador */
+}
+
+.active-link mat-icon {
+    color: #3f51b5;
+}
+
+/* Espaciador para la barra superior */
+.spacer {
+    flex: 1 1 auto;
+}
+
+.top-toolbar {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 2; /* Para que la sombra caiga sobre el contenido */
+}
+
+/* Wrapper para el contenido de las páginas */
+.content-wrapper {
+    padding: 20px;
+    /* Esto ayuda a que el contenido no quede pegado a los bordes en pantallas grandes */
+    max-width: 100%; 
+    box-sizing: border-box;
+}

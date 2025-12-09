@@ -1,0 +1,63 @@
+/* --- CABECERA Y BUSCADOR (Igual al anterior para consistencia) --- */
+.header-section {
+    display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;
+}
+.page-title { font-size: 1.8rem; font-weight: 700; color: #1a237e; margin: 0; }
+.page-subtitle { color: #7986cb; margin: 0; font-size: 0.95rem; }
+
+.btn-nuevo {
+    background: linear-gradient(135deg, #009688, #00796b); /* Verde Azulado para Propiedades */
+    padding: 0 25px; height: 45px; border-radius: 25px; font-weight: 500;
+}
+
+.search-bar-container {
+    background: white; padding: 12px 20px; border-radius: 30px;
+    display: flex; align-items: center; gap: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
+    max-width: 500px; border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+.search-bar-container:focus-within {
+    box-shadow: 0 6px 20px rgba(0, 150, 136, 0.15); border-color: #009688;
+}
+.search-bar-container input { border: none; outline: none; font-size: 1rem; width: 100%; color: #444; }
+
+/* --- TABLA --- */
+.table-container { border-radius: 12px; overflow: hidden; background: white; border: 1px solid rgba(0,0,0,0.03); }
+th.mat-header-cell { font-size: 12px; text-transform: uppercase; color: #999; font-weight: 600; padding: 15px; }
+
+.hover-row { transition: background-color 0.2s ease; cursor: default; }
+.hover-row:hover { background-color: #f0fdf4; } /* Verde muy muy suave al hover */
+
+/* --- ESTILOS ESPECÍFICOS DE PROPIEDAD --- */
+.property-profile { display: flex; align-items: center; gap: 15px; padding: 8px 0; }
+
+.property-icon {
+    width: 45px; height: 45px;
+    border-radius: 12px; /* Cuadrado redondeado */
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.property-icon mat-icon { font-size: 24px; width: 24px; height: 24px; }
+
+/* Colores según tipo */
+.icon-depto { background: linear-gradient(135deg, #42a5f5, #1e88e5); } /* Azul */
+.icon-casa { background: linear-gradient(135deg, #66bb6a, #43a047); } /* Verde */
+.icon-local { background: linear-gradient(135deg, #ffa726, #fb8c00); } /* Naranja */
+.icon-default { background: linear-gradient(135deg, #bdc3c7, #95a5a6); } /* Gris */
+
+.property-info { display: flex; flex-direction: column; }
+.property-address { font-weight: 700; color: #2c3e50; font-size: 14px; }
+.property-type { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.badge-tipo {
+    background: #f5f5f5; color: #666;
+    padding: 4px 10px; border-radius: 4px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+}
+
+/* Botones */
+.action-btn { opacity: 0.6; transition: all 0.2s; }
+.hover-row:hover .action-btn { opacity: 1; }

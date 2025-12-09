@@ -1,0 +1,104 @@
+<h2 mat-dialog-title style="background: #3f51b5; color: white; display: flex; align-items: center; gap: 10px;">
+    <mat-icon>assignment</mat-icon>
+    Detalle del Contrato #{{ data.id }}
+  </h2>
+  
+  <mat-dialog-content style="padding: 20px;">
+  
+    <div style="margin-bottom: 20px; text-align: right;">
+      <span [style.background]="data.activo ? '#e8f5e9' : '#ffebee'"
+            [style.color]="data.activo ? '#2e7d32' : '#c62828'"
+            style="padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; border: 1px solid currentColor;">
+        {{ data.activo ? '✅ VIGENTE' : '🔴 FINALIZADO' }}
+      </span>
+    </div>
+  
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+      
+      <div>
+        <h3 style="color: #3f51b5; border-bottom: 2px solid #eee; padding-bottom: 5px;">
+          <mat-icon style="vertical-align: middle; font-size: 20px;">home</mat-icon> Inmueble
+        </h3>
+        <p><strong>Dirección:</strong> {{ data.propiedad.direccion }}</p>
+        <p><strong>Tipo:</strong> {{ data.propiedad.tipo }}</p>
+        <br>
+        
+        <h3 style="color: #3f51b5; border-bottom: 2px solid #eee; padding-bottom: 5px;">
+          <mat-icon style="vertical-align: middle; font-size: 20px;">person</mat-icon> Inquilino
+        </h3>
+        <p><strong>Nombre:</strong> {{ data.inquilino.nombre_completo }}</p>
+        <p><strong>DNI:</strong> {{ data.inquilino.dni }}</p>
+        <p><strong>Email:</strong> {{ data.inquilino.email || '-' }}</p>
+      </div>
+  
+      <div>
+        <h3 style="color: #3f51b5; border-bottom: 2px solid #eee; padding-bottom: 5px;">
+          <mat-icon style="vertical-align: middle; font-size: 20px;">description</mat-icon> Condiciones
+        </h3>
+        <p><strong>Monto Alquiler:</strong> <span style="font-size: 1.2em; font-weight: bold;">${{ data.monto_actual }}</span></p>
+        <p><strong>Inicio:</strong> {{ data.fecha_inicio }}</p>
+        <p><strong>Fin:</strong> {{ data.fecha_fin }}</p>
+        <p><strong>Día de Vencimiento:</strong> {{ data.dia_vencimiento }} de cada mes</p>
+      </div>
+    </div>
+
+    <div *ngIf="data.archivo_url" style="margin-top: 20px; background: #e3f2fd; padding: 15px; border-radius: 8px; border: 1px solid #bbdefb; display: flex; align-items: center; justify-content: space-between;">
+        
+      <div style="display: flex; align-items: center; gap: 10px;">
+          <mat-icon style="color: #1565c0;">description</mat-icon>
+          <div>
+              <strong style="color: #0d47a1; display: block;">Contrato Firmado Digital</strong>
+              <span style="font-size: 11px; color: #555;">Documento adjunto disponible</span>
+          </div>
+      </div>
+
+      <a mat-raised-button color="primary" 
+         [href]="'http://localhost:8000/storage/' + data.archivo_url" 
+         target="_blank">
+          <mat-icon>visibility</mat-icon> Ver / Descargar
+      </a>
+
+    </div>
+
+    <div style="margin-top: 30px; background-color: #f9f9f9; padding: 15px; border-radius: 8px;">
+      <h3 style="color: #555; margin-top: 0;">
+        <mat-icon style="vertical-align: middle;">group</mat-icon> Garantes / Fiadores
+      </h3>
+      
+      <div *ngIf="data.garantes && data.garantes.length > 0; else sinGarantes">
+        <table style="width: 100%; border-collapse: collapse; background: white;">
+          <thead>
+              <tr style="background: #e0e0e0; font-size: 12px; text-transform: uppercase;">
+                  <th style="padding: 8px; text-align: left;">Nombre Completo</th>
+                  <th style="padding: 8px; text-align: left;">DNI</th>
+                  <th style="padding: 8px; text-align: left;">Teléfono</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr *ngFor="let g of data.garantes" style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 10px;">{{ g.nombre_completo }}</td>
+                  <td style="padding: 10px;">{{ g.dni }}</td>
+                  <td style="padding: 10px;">{{ g.telefono || '-' }}</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+  
+      <ng-template #sinGarantes>
+        <div style="text-align: center; padding: 10px; color: #999; font-style: italic;">
+          No se registraron garantes para este contrato.
+        </div>
+      </ng-template>
+    </div>
+  
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end" style="padding: 15px; background: #f5f5f5;">
+    
+    <button mat-flat-button color="warn" *ngIf="data.activo" (click)="finalizarContrato()">
+      <mat-icon>block</mat-icon> Finalizar Anticipadamente
+    </button>
+  
+    <span style="flex: 1;"></span>
+    <button mat-stroked-button mat-dialog-close>Cerrar Ventana</button>
+  </mat-dialog-actions>

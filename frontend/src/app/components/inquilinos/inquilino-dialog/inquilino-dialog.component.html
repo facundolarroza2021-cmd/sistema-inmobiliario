@@ -1,0 +1,43 @@
+<h2 mat-dialog-title style="background: #e91e63; color: white; display: flex; align-items: center; gap: 10px;">
+    <mat-icon>person</mat-icon>
+    {{ data ? 'Editar Inquilino' : 'Nuevo Inquilino' }}
+  </h2>
+  
+  <mat-dialog-content style="padding-top: 20px; min-width: 450px;">
+    
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+      
+      <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>Nombre Completo</mat-label>
+        <input matInput [(ngModel)]="nuevoInquilino.nombre_completo" cdkFocusInitial placeholder="Ej: Ana Gómez">
+        <mat-icon matSuffix>badge</mat-icon>
+      </mat-form-field>
+  
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <mat-form-field appearance="outline">
+              <mat-label>DNI / Documento</mat-label>
+              <input matInput [(ngModel)]="nuevoInquilino.dni" type="number">
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline">
+              <mat-label>Teléfono</mat-label>
+              <input matInput [(ngModel)]="nuevoInquilino.telefono" type="tel">
+              <mat-icon matSuffix>phone</mat-icon>
+          </mat-form-field>
+      </div>
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Correo Electrónico</mat-label>
+        <input matInput [(ngModel)]="nuevoInquilino.email" type="email" placeholder="contacto@ejemplo.com">
+        <mat-icon matSuffix>email</mat-icon>
+      </mat-form-field>
+  
+    </div>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end" style="padding: 15px; background: #f9f9f9;">
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button mat-raised-button color="primary" style="background-color: #e91e63;" (click)="guardar()">
+      <mat-icon>save</mat-icon> Guardar Ficha
+    </button>
+  </mat-dialog-actions>

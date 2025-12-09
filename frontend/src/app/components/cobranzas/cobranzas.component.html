@@ -1,0 +1,125 @@
+<div class="container-fluid" style="padding: 20px;">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 20px;">
+      
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="background-color: #ff9800; padding: 10px; border-radius: 12px; color: white; display: flex;">
+          <mat-icon>point_of_sale</mat-icon>
+        </div>
+        <div>
+          <h1 style="margin: 0; font-size: 1.5rem; font-weight: 500;">Caja y Cobros</h1>
+          <small style="color: #666;">Gestión de deudas pendientes</small>
+        </div>
+      </div>
+  
+      <button *ngIf="selection.selected.length > 0" 
+              mat-raised-button 
+              style="background-color: #4caf50; color: white; font-size: 1.1rem; padding: 5px 20px; animation: fadeIn 0.3s;"
+              (click)="cobrarSeleccionados()">
+        <mat-icon>checklist</mat-icon> 
+        COBRAR {{ selection.selected.length }} ITEMS
+      </button>
+  
+      <mat-form-field appearance="outline" style="width: 300px; font-size: 14px; margin-bottom: -1.25em;">
+        <mat-label>Buscar Inquilino o Periodo...</mat-label>
+        <input matInput (keyup)="aplicarFiltro($event)" placeholder="Ej. Juan o 2025-01">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  
+    <div *ngIf="cargando" style="display: flex; justify-content: center; padding: 50px;">
+      <mat-spinner diameter="50" color="accent"></mat-spinner>
+    </div>
+  
+    <div class="mat-elevation-z2" [hidden]="cargando" style="border-radius: 12px; overflow: hidden; background: white;">
+      <table mat-table [dataSource]="dataSource" matSort>
+  
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="$event ? toggleAllRows() : null"
+                          [checked]="selection.hasValue() && isAllSelected()"
+                          [indeterminate]="selection.hasValue() && !isAllSelected()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? selection.toggle(row) : null"
+                          [checked]="selection.isSelected(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="periodo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Periodo </th>
+          <td mat-cell *matCellDef="let element"> 
+            <span style="font-family: monospace; font-size: 1.1em; background: #f5f5f5; padding: 4px 8px; border-radius: 4px;">
+              {{element.periodo}}
+            </span>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="inquilino">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Inquilino </th>
+          <td mat-cell *matCellDef="let element"> 
+              <strong>{{element.contrato?.inquilino?.nombre_completo}}</strong>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="propiedad">
+          <th mat-header-cell *matHeaderCellDef> Propiedad </th>
+          <td mat-cell *matCellDef="let element"> 
+               {{element.contrato?.propiedad?.direccion}}
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="monto">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: right;"> Saldo </th>
+          <td mat-cell *matCellDef="let element" style="text-align: right;"> 
+            <span *ngIf="element.saldo_pendiente > 0" style="color: #d32f2f; font-weight: bold; font-size: 1.1em;">
+              $ {{element.saldo_pendiente | number:'1.0-0'}}
+            </span>
+            <span *ngIf="element.saldo_pendiente == 0" style="color: #2e7d32; font-weight: bold; opacity: 0.7;">
+              $ 0 <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">check</mat-icon>
+            </span>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Estado </th>
+          <td mat-cell *matCellDef="let element" style="text-align: center;"> 
+            <mat-chip 
+                [style.background-color]="element.estado === 'PAGADO' ? '#e8f5e9' : (element.estado === 'PARCIAL' ? '#fff8e1' : '#ffebee')"
+                [style.color]="element.estado === 'PAGADO' ? '#2e7d32' : (element.estado === 'PARCIAL' ? '#f57f17' : '#c62828')">
+            
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle; margin-right: 5px;">
+                    {{ element.estado === 'PAGADO' ? 'check_circle' : (element.estado === 'PARCIAL' ? 'pie_chart' : 'pending') }}
+                </mat-icon>
+                
+                {{ element.estado }}
+            </mat-chip>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="accion">
+          <th mat-header-cell *matHeaderCellDef> </th>
+          <td mat-cell *matCellDef="let element" style="text-align: right; padding-right: 20px;">
+            <button *ngIf="element.estado === 'PAGADO'" mat-icon-button color="primary" (click)="verComprobante(element)">
+              <mat-icon>picture_as_pdf</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+        <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
+  
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell" colspan="7" style="text-align: center; padding: 40px; color: #888;">
+            <mat-icon style="font-size: 40px; width: 40px; height: 40px; opacity: 0.5;">search_off</mat-icon>
+            <p>No se encontraron deudas.</p>
+          </td>
+        </tr>
+      </table>
+  
+      <mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator>
+    </div>
+  </div>

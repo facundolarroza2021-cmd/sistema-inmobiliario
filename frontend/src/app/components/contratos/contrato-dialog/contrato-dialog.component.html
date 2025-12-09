@@ -1,0 +1,88 @@
+<h2 mat-dialog-title style="background: #4caf50; color: white;">
+    <mat-icon style="vertical-align: middle; margin-right: 10px;">assignment</mat-icon>
+    Nuevo Contrato
+  </h2>
+  
+  <mat-dialog-content style="padding-top: 20px;">
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+      
+      <mat-form-field appearance="outline">
+        <mat-label>Inquilino</mat-label>
+        <mat-select [(ngModel)]="nuevoContrato.inquilino_id">
+          <mat-option *ngFor="let i of listaInquilinos" [value]="i.id">
+            {{ i.nombre_completo }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Propiedad</mat-label>
+        <mat-select [(ngModel)]="nuevoContrato.propiedad_id">
+          <mat-option *ngFor="let p of listaPropiedades" [value]="p.id">
+            {{ p.direccion }} ({{ p.tipo }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Monto ($)</mat-label>
+        <input matInput type="number" [(ngModel)]="nuevoContrato.monto_actual">
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Inicio</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="nuevoContrato.fecha_inicio">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+  
+      <mat-form-field appearance="outline">
+        <mat-label>Meses</mat-label>
+        <input matInput type="number" [(ngModel)]="nuevoContrato.duracion_meses">
+      </mat-form-field>
+    </div>
+  
+    <div style="background: #f5f5f5; padding: 10px; border-radius: 8px; margin-top: 10px;">
+      <h4 style="margin: 0 0 10px 0;">Agregar Garante</h4>
+      <div style="display: flex; gap: 10px;">
+          <input class="input-simple" placeholder="Nombre" [(ngModel)]="nuevoGarante.nombre_completo">
+          <input class="input-simple" placeholder="DNI" [(ngModel)]="nuevoGarante.dni">
+          <button mat-mini-fab color="accent" (click)="agregarGarante()"><mat-icon>add</mat-icon></button>
+      </div>
+      
+      <div *ngFor="let g of listaGarantes; let i = index" style="font-size: 12px; margin-top: 5px; color: #666;">
+          • {{g.nombre_completo}} <a (click)="eliminarGarante(i)" style="color: red; cursor: pointer;">(x)</a>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 15px;">
+      <h4 style="margin: 0 0 10px 0; color: #555; font-size: 14px;">
+          <mat-icon style="vertical-align: bottom; font-size: 18px;">attach_file</mat-icon> 
+          Documento Firmado (PDF o Imagen)
+      </h4>
+      
+      <div style="display: flex; align-items: center; gap: 10px;">
+          <button mat-stroked-button type="button" color="primary" (click)="fileInput.click()">
+              <mat-icon>cloud_upload</mat-icon> Subir Archivo
+          </button>
+          
+          <input #fileInput type="file" (change)="onArchivoSeleccionado($event)" 
+                 style="display: none;" accept=".pdf,.jpg,.jpeg,.png">
+          
+          <span *ngIf="archivoSeleccionado" style="color: green; font-size: 12px; font-weight: 500;">
+              ✅ {{ archivoSeleccionado.name }}
+          </span>
+      </div>
+  </div>
+  
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancelar</button>
+    <button mat-raised-button color="primary" (click)="guardar()" style="background-color: #4caf50;">Confirmar</button>
+  </mat-dialog-actions>
+  
+  <style>
+      .input-simple { border: 1px solid #ccc; padding: 8px; border-radius: 4px; flex: 1; }
+  </style>

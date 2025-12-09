@@ -1,0 +1,82 @@
+<mat-sidenav-container class="sidenav-container">
+
+  <mat-sidenav #sidenav mode="side" [opened]="menuAbierto" class="sidenav">
+    
+    <div class="sidenav-header">
+      <mat-icon style="transform: scale(1.5);">business</mat-icon>
+      <h2>Inmobiliaria</h2>
+    </div>
+
+    <mat-nav-list>
+      
+      <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>Inicio</span>
+      </a>
+
+      <mat-divider></mat-divider>
+      <div mat-subheader>Gestión</div>
+
+      <a mat-list-item routerLink="/propietarios" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>person</mat-icon>
+        <span matListItemTitle>Propietarios</span>
+      </a>
+
+      <a mat-list-item routerLink="/propiedades" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>home_work</mat-icon>
+        <span matListItemTitle>Propiedades</span>
+      </a>
+
+      <a mat-list-item routerLink="/inquilinos" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>group</mat-icon>
+        <span matListItemTitle>Inquilinos</span>
+      </a>
+
+      <mat-divider></mat-divider>
+      <div mat-subheader>Operaciones</div>
+
+      <a mat-list-item routerLink="/contratos" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>assignment</mat-icon>
+        <span matListItemTitle>Contratos</span>
+      </a>
+
+      <a mat-list-item routerLink="/cobranzas" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>point_of_sale</mat-icon>
+        <span matListItemTitle>Caja / Cobros</span>
+      </a>
+
+      <a mat-list-item routerLink="/liquidaciones" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>request_quote</mat-icon>
+        <span matListItemTitle>Liquidaciones</span>
+      </a>
+
+    </mat-nav-list>
+  </mat-sidenav>
+
+
+  <mat-sidenav-content>
+    
+    <mat-toolbar color="primary" class="top-toolbar">
+      <button mat-icon-button (click)="menuAbierto = !menuAbierto">
+        <mat-icon>menu</mat-icon>
+      </button>
+      
+      <span>Sistema de Gestión</span>
+      
+      <span class="spacer"></span>
+      
+      <button mat-icon-button>
+        <mat-icon>notifications</mat-icon>
+      </button>
+      <button mat-icon-button>
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+
+  </mat-sidenav-content>
+
+</mat-sidenav-container>
