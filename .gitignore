@@ -18,6 +18,7 @@ backend/storage/app/public/*
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
+frontend/.angular/cache/
 
 # --- GENERAL ---
 .vscode/
