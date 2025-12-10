@@ -1,0 +1,141 @@
+/* Layout Principal */
+.split-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: #fff;
+  }
+  
+  /* --- LADO IZQUIERDO (IMAGEN) --- */
+  .image-side {
+    flex: 1.5; /* Ocupa más espacio que el formulario (60%) */
+    background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  
+  /* Capa oscura sobre la imagen para que se lea el texto */
+  .overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+    display: flex;
+    align-items: flex-end; /* Texto abajo */
+    padding: 60px;
+  }
+  
+  .brand-text {
+    color: white;
+  }
+  
+  .brand-text h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 1.1;
+  }
+  
+  .brand-text p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 300;
+  }
+  
+  /* --- LADO DERECHO (FORMULARIO) --- */
+  .form-side {
+    flex: 1; /* 40% del ancho */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    padding: 40px;
+  }
+  
+  .form-container {
+    width: 100%;
+    max-width: 380px; /* Ancho máximo del formulario */
+  }
+  
+  /* Header del Formulario */
+  .form-header {
+    margin-bottom: 40px;
+    text-align: left;
+  }
+  
+  .icon-box {
+    width: 50px;
+    height: 50px;
+    background-color: #e3f2fd; /* Azul muy clarito */
+    color: #1976d2; /* Azul Material */
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 10px 0;
+  }
+  
+  .subtitle {
+    color: #666;
+    font-size: 1rem;
+  }
+  
+  /* Campos */
+  .full-width {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  
+  /* Enlaces y Acciones */
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 25px;
+  }
+  
+  .forgot-pass {
+    color: #1976d2;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  .forgot-pass:hover {
+    text-decoration: underline;
+  }
+  
+  /* Botón Principal */
+  .btn-submit {
+    width: 100%;
+    height: 56px; /* Altura estándar de Material */
+    font-size: 16px;
+    border-radius: 8px;
+    box-shadow: none !important; /* Flat design */
+  }
+  
+  .footer {
+    margin-top: 40px;
+    text-align: center;
+    color: #999;
+    font-size: 0.8rem;
+  }
+  
+  /* --- RESPONSIVE --- */
+  /* En tablets y móviles, ocultamos la imagen */
+  @media (max-width: 900px) {
+    .image-side {
+      display: none;
+    }
+    
+    .form-side {
+      background-color: #f9f9f9; /* Fondo gris claro en móvil para que no sea tan brillante */
+    }
+  }

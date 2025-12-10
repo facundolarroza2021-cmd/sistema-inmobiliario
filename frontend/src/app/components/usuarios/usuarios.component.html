@@ -1,0 +1,47 @@
+<div class="container-usuario">
+    <mat-card class="card-usuario">
+      <mat-card-header>
+        <mat-card-title>Registrar Nuevo Usuario</mat-card-title>
+        <mat-card-subtitle>Crea accesos para tu equipo de trabajo</mat-card-subtitle>
+      </mat-card-header>
+  
+      <mat-card-content>
+        <form [formGroup]="usuarioForm" (ngSubmit)="onSubmit()">
+  
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre Completo</mat-label>
+            <input matInput formControlName="name" placeholder="Ej: Juan Pérez">
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Correo Electrónico</mat-label>
+            <input matInput formControlName="email" type="email" placeholder="usuario@sistema.com">
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Rol / Permisos</mat-label>
+            <mat-select formControlName="role">
+              @for (rol of roles; track rol.value) {
+                <mat-option [value]="rol.value">{{ rol.viewValue }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput formControlName="password" type="password">
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Confirmar Contraseña</mat-label>
+            <input matInput formControlName="password_confirmation" type="password">
+          </mat-form-field>
+  
+          <button mat-raised-button color="primary" type="submit" [disabled]="usuarioForm.invalid" class="full-width">
+            CREAR USUARIO
+          </button>
+  
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>

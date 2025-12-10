@@ -7,5 +7,5 @@ fi
 
 git add .
 git commit -m "$1"
-git push
+git push origin main
 echo "☁️ Cambios subidos a GitHub correctamente."

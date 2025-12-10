@@ -123,4 +123,8 @@ export class ApiService {
   eliminarPropietario(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/propietarios/${id}`);
   }
+  // REGISTRO DE USUARIO
+  registrarUsuario(datos: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, datos);
+  }
 }

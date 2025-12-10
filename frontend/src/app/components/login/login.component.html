@@ -1,0 +1,58 @@
+<div class="split-layout">
+  
+    <div class="image-side">
+      <div class="overlay">
+        <div class="brand-text">
+          <h1>Gestión Inmobiliaria</h1>
+          <p>Potencia tu negocio, simplifica tu administración.</p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="form-side">
+      <div class="form-container">
+        
+        <div class="form-header">
+          <div class="icon-box">
+            <mat-icon>vpn_key</mat-icon>
+          </div>
+          <h2>Bienvenido de nuevo</h2>
+          <p class="subtitle">Ingresa tus credenciales para acceder</p>
+        </div>
+  
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email Corporativo</mat-label>
+            <input matInput formControlName="email" placeholder="admin@inmobiliaria.com">
+            <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+              Email inválido
+            </mat-error>
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'">
+            <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+              <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+          </mat-form-field>
+  
+          <div class="actions">
+            <a href="#" class="forgot-pass">¿Olvidaste tu contraseña?</a>
+          </div>
+  
+          <button mat-flat-button color="primary" type="submit" [disabled]="loginForm.invalid" class="btn-submit">
+            INGRESAR AL SISTEMA
+          </button>
+  
+        </form>
+  
+        <div class="footer">
+          <p>&copy; 2025 Sistema Inmobiliario v1.0</p>
+        </div>
+  
+      </div>
+    </div>
+  
+  </div>
