@@ -127,4 +127,20 @@ export class ApiService {
   registrarUsuario(datos: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, datos);
   }
+  // --- CAJA CHICA / TESORERÍA ---
+  getMovimientosCaja(mes: number, anio: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/caja?mes=${mes}&anio=${anio}`);
+  }
+
+  getBalanceCaja(mes: number, anio: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/caja/balance?mes=${mes}&anio=${anio}`);
+  }
+
+  registrarMovimientoCaja(datos: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/caja`, datos);
+  }
+
+  eliminarMovimientoCaja(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/caja/${id}`);
+  }
 }

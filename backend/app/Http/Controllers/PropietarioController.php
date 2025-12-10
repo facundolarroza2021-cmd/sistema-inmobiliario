@@ -7,13 +7,19 @@ use Illuminate\Http\Request;
 
 class PropietarioController extends Controller
 {
-    // Listar todos (Para el dropdown del frontend)
+    /**
+     * Retorna lista simple de propietarios.
+     * Útil para selectores/dropdowns en la UI.
+     */
     public function index()
     {
         return Propietario::all();
     }
 
-    // Crear nuevo
+    /**
+     * Crea un nuevo propietario.
+     * Valida unicidad de DNI.
+     */
     public function store(Request $request)
     {
         
@@ -27,17 +33,24 @@ class PropietarioController extends Controller
 
         return response()->json($propietario, 201);
     }
+    /**
+     * Muestra el detalle completo de un propietario.
+     * * Carga relaciones anidadas (Eager Loading):
+     * - Propiedades -> Contrato Activo -> Inquilino
+     * - Liquidaciones históricas
+     * * Calcula KPIs básicos (Total propiedades, Tasa de ocupación).
+     *
+     * @param int $id ID del propietario.
+     * @return \Illuminate\Http\JsonResponse Datos del propietario + KPIs.
+     */
     public function show($id)
     {
-        // Buscamos al dueño
+        
         $propietario = Propietario::with([
-            // Traer sus propiedades
             'propiedades.contratoActivo.inquilino', 
-            // Traer sus liquidaciones (pagos que ya le hicimos)
             'liquidaciones'
         ])->findOrFail($id);
 
-        // Cálculo rápido de KPIs (Opcional por ahora)
         $totalPropiedades = $propietario->propiedades->count();
         $propiedadesAlquiladas = $propietario->propiedades->whereNotNull('contratoActivo')->count();
 
@@ -46,18 +59,21 @@ class PropietarioController extends Controller
             'kpis' => [
                 'total_propiedades' => $totalPropiedades,
                 'ocupacion' => $propiedadesAlquiladas,
-                // Aquí en el futuro calcularemos la deuda real
                 'saldo_pendiente' => 0 
             ]
         ]);
     }
+    /**
+     * Actualiza datos del propietario.
+     * * Nota: La validación 'unique' excluye el ID actual para permitir
+     * guardar cambios sin que salte error de "DNI ya existe" sobre sí mismo.
+     */
     public function update(Request $request, $id)
     {
         $propietario = Propietario::findOrFail($id);
 
         $request->validate([
             'nombre_completo' => 'required|string',
-            // VALIDACIÓN INTELIGENTE: Unique ignorando al ID actual
             'dni' => 'required|unique:propietarios,dni,'.$id,
             'email' => 'required|email|unique:propietarios,email,'.$id,
             'telefono' => 'nullable',

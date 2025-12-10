@@ -1,0 +1,162 @@
+<div class="container-caja">
+  
+    <div class="header-section">
+      <h1>Tesorería & Caja Chica</h1>
+      
+      <div class="filtros">
+        <mat-form-field appearance="outline" style="width: 150px;">
+          <mat-label>Mes</mat-label>
+          <mat-select [(value)]="mesActual" (selectionChange)="cambiarPeriodo()">
+            @for (m of meses; track m.val) {
+              <mat-option [value]="m.val">{{ m.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline" style="width: 100px; margin-left: 10px;">
+          <mat-label>Año</mat-label>
+          <input matInput type="number" [(ngModel)]="anioActual" (change)="cambiarPeriodo()">
+        </mat-form-field>
+      </div>
+    </div>
+  
+    <div class="resumen-cards">
+      <mat-card class="card-total ingreso">
+        <mat-icon>arrow_upward</mat-icon>
+        <div>
+          <h3>Ingresos</h3>
+          <p>{{ balance.ingresos | currency }}</p>
+        </div>
+      </mat-card>
+  
+      <mat-card class="card-total egreso">
+        <mat-icon>arrow_downward</mat-icon>
+        <div>
+          <h3>Egresos</h3>
+          <p>{{ balance.egresos | currency }}</p>
+        </div>
+      </mat-card>
+  
+      <mat-card class="card-total neto" [class.negativo]="balance.balance_neto < 0">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <div>
+          <h3>Balance Neto</h3>
+          <p>{{ balance.balance_neto | currency }}</p>
+        </div>
+      </mat-card>
+    </div>
+  
+    <div class="content-layout">
+      
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>Nuevo Movimiento</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <form [formGroup]="cajaForm" (ngSubmit)="onSubmit()">
+            
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Tipo</mat-label>
+              <mat-select formControlName="tipo">
+                <mat-option value="INGRESO">INGRESO (Entra dinero)</mat-option>
+                <mat-option value="EGRESO">EGRESO (Sale dinero)</mat-option>
+              </mat-select>
+            </mat-form-field>
+  
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Categoría</mat-label>
+              <mat-select formControlName="categoria">
+                @if (cajaForm.get('tipo')?.value === 'INGRESO') {
+                  @for (cat of categoriasIngreso; track cat) { <mat-option [value]="cat">{{cat}}</mat-option> }
+                } @else {
+                  @for (cat of categoriasEgreso; track cat) { <mat-option [value]="cat">{{cat}}</mat-option> }
+                }
+              </mat-select>
+            </mat-form-field>
+  
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Monto</mat-label>
+              <span matPrefix>$ &nbsp;</span>
+              <input matInput type="number" formControlName="monto">
+            </mat-form-field>
+  
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Descripción / Detalle</mat-label>
+              <textarea matInput formControlName="descripcion" rows="2"></textarea>
+            </mat-form-field>
+  
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Fecha</mat-label>
+              <input matInput type="date" formControlName="fecha">
+            </mat-form-field>
+  
+            <button mat-raised-button color="primary" type="submit" [disabled]="cajaForm.invalid" class="full-width">
+              REGISTRAR
+            </button>
+          </form>
+        </mat-card-content>
+      </mat-card>
+  
+      <div class="table-container">
+        <table mat-table [dataSource]="movimientos" class="mat-elevation-z2">
+  
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef> Fecha </th>
+            <td mat-cell *matCellDef="let element"> {{element.fecha | date:'dd/MM/yyyy'}} </td>
+          </ng-container>
+  
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef> Tipo </th>
+            <td mat-cell *matCellDef="let element"> 
+              <span class="badge" [class.ingreso]="element.tipo === 'INGRESO'" [class.egreso]="element.tipo === 'EGRESO'">
+                {{element.tipo}}
+              </span>
+            </td>
+          </ng-container>
+  
+          <ng-container matColumnDef="categoria">
+            <th mat-header-cell *matHeaderCellDef> Categoría </th>
+            <td mat-cell *matCellDef="let element"> {{element.categoria}} </td>
+          </ng-container>
+  
+          <ng-container matColumnDef="descripcion">
+            <th mat-header-cell *matHeaderCellDef> Detalle </th>
+            <td mat-cell *matCellDef="let element"> {{element.descripcion}} </td>
+          </ng-container>
+  
+          <ng-container matColumnDef="usuario">
+            <th mat-header-cell *matHeaderCellDef> Por </th>
+            <td mat-cell *matCellDef="let element"> {{element.usuario?.name}} </td>
+          </ng-container>
+  
+          <ng-container matColumnDef="monto">
+            <th mat-header-cell *matHeaderCellDef> Monto </th>
+            <td mat-cell *matCellDef="let element" 
+                [style.color]="element.tipo === 'INGRESO' ? 'green' : 'red'" 
+                style="font-weight: bold;"> 
+                {{element.monto | currency}} 
+            </td>
+          </ng-container>
+  
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> </th>
+            <td mat-cell *matCellDef="let element">
+              @if (authService.hasRole(['admin'])) {
+                <button mat-icon-button color="warn" (click)="eliminar(element.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              }
+            </td>
+          </ng-container>
+  
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        
+        @if (movimientos.length === 0) {
+          <p style="text-align: center; padding: 20px; color: #777;">No hay movimientos este mes.</p>
+        }
+      </div>
+  
+    </div>
+  </div>

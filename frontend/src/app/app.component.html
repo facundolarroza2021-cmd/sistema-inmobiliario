@@ -53,6 +53,11 @@
         @if (authService.hasRole(['admin'])) {
           <mat-divider></mat-divider>
           <div mat-subheader>Administración</div>
+
+          <a mat-list-item routerLink="/caja" routerLinkActive="active-link">
+            <mat-icon matListItemIcon>account_balance</mat-icon>
+            <span matListItemTitle>Caja Chica</span>
+          </a>
         
           <a mat-list-item routerLink="/usuarios" routerLinkActive="active-link">
             <mat-icon matListItemIcon>manage_accounts</mat-icon>

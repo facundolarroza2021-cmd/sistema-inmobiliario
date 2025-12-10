@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController; // <--- AGREGADO (Faltaba este)
+use App\Http\Controllers\AuthController; 
 use App\Http\Controllers\PropietarioController;
 use App\Http\Controllers\InquilinoController;
 use App\Http\Controllers\PropiedadController;
@@ -11,13 +11,14 @@ use App\Http\Controllers\CuotaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LiquidacionController;
 use App\Http\Controllers\GastoController;
+use App\Http\Controllers\CajaController;
 
 /*
 |--------------------------------------------------------------------------
 | RUTAS PÚBLICAS (No requieren token)
 |--------------------------------------------------------------------------
 */
-Route::post('/login', [AuthController::class, 'login']); // <--- ESENCIAL PARA ENTRAR
+Route::post('/login', [AuthController::class, 'login']); 
 
 /*
 |--------------------------------------------------------------------------
@@ -33,12 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/register', [AuthController::class, 'register']); 
         Route::delete('/propiedades/{id}', [PropiedadController::class, 'destroy']);
         Route::delete('/inquilinos/{id}', [InquilinoController::class, 'destroy']);
-        Route::delete('/propietarios/{id}', [PropietarioController::class, 'destroy']); // Movido aquí por seguridad
-        Route::delete('/gastos/{id}', [GastoController::class, 'destroy']); // Movido aquí por seguridad
+        Route::delete('/propietarios/{id}', [PropietarioController::class, 'destroy']); 
+        Route::delete('/gastos/{id}', [GastoController::class, 'destroy']); 
+        Route::delete('/caja/{id}', [CajaController::class, 'destroy']);
     });
 
     // --- GRUPO 2: ADMINISTRATIVOS (Incluye Admin) ---
-    // Pueden crear, editar y gestionar el día a día, pero NO eliminar
     Route::middleware('role:admin,administrativo')->group(function () {
         
         // Propietarios
@@ -60,10 +61,13 @@ Route::middleware('auth:sanctum')->group(function () {
         // Finanzas (Crear gastos y liquidaciones)
         Route::post('/liquidaciones', [LiquidacionController::class, 'store']);
         Route::post('/gastos', [GastoController::class, 'store']);
+
+        Route::get('/caja', [CajaController::class, 'index']); 
+        Route::post('/caja', [CajaController::class, 'store']); 
+        Route::get('/caja/balance', [CajaController::class, 'balance']);
     });
 
-    // --- GRUPO 3: COBRADORES (Incluye a todos) ---
-    // Solo lectura y cobro
+    //  COBRADORES ---
     Route::middleware('role:admin,administrativo,cobrador')->group(function () {
         
         // Lectura general (Para buscadores y listados)

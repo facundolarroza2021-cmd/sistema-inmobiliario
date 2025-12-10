@@ -11,6 +11,7 @@ import { LiquidacionesComponent } from './components/liquidaciones/liquidaciones
 import {PropietarioDetalleComponent} from './components/propietarios/propietario-detalle/propietario-detalle.component';
 import { PropiedadDetalleComponent } from './components/propiedades/propiedad-detalle/propiedad-detalle.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
+import { CajaComponent } from './components/caja/caja.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent }, // Ruta pública
@@ -31,6 +32,7 @@ export const routes: Routes = [
         { path: 'propietarios/:id', component: PropietarioDetalleComponent },
         { path: 'propiedades/:id', component: PropiedadDetalleComponent },
         { path: 'usuarios', component: UsuariosComponent },
+        { path: 'caja', component: CajaComponent },
       ]
     },
 ];

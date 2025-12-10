@@ -14,27 +14,23 @@ class ContratoController extends Controller
 {
     public function store(Request $request)
     {
-        // 1. Validar
         $request->validate([
             'inquilino_id' => 'required',
             'propiedad_id' => 'required',
-            'monto_actual' => 'required', // Quitamos 'numeric' estricto por si llega como string
+            'monto_actual' => 'required', 
             'fecha_inicio' => 'required|date', 
             'archivo' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
             'garantes' => 'nullable', 
         ]);
         $rutaArchivo = null;
         if ($request->hasFile('archivo')) {
-            // Lo guardamos en la carpeta 'contratos' dentro del disco 'public'
             $rutaArchivo = $request->file('archivo')->store('contratos', 'public');
         }
 
-        // 2. Calcular Fecha Fin Automáticamente
         $cantidadMeses = (int) ($request->meses ?? 12);
         $inicio = Carbon::parse($request->fecha_inicio);
         $fin = $inicio->copy()->addMonths($cantidadMeses);
 
-        // 3. Crear Contrato
         $contrato = Contrato::create([
             'inquilino_id' => $request->inquilino_id,
             'propiedad_id' => $request->propiedad_id,
@@ -47,7 +43,6 @@ class ContratoController extends Controller
         ]);
 
         if ($request->has('garantes')) {
-            // Decodificamos el TEXTO JSON a un ARRAY PHP real
             $garantesData = json_decode($request->garantes, true);
             
             if (is_array($garantesData)) {
@@ -63,7 +58,6 @@ class ContratoController extends Controller
             }
         }
 
-        // 4. Generar Cuotas (Tu código que ya funcionaba)
         $fecha_aux = $inicio->copy();
         $numero_cuota = 1;
 
@@ -100,7 +94,7 @@ class ContratoController extends Controller
             return response()->json(['message' => 'Contrato no encontrado'], 404);
         }
     
-        $contrato->activo = false; // Lo marcamos como finalizado
+        $contrato->activo = false; 
         $contrato->save();
     
         return response()->json(['mensaje' => 'Contrato finalizado correctamente']);

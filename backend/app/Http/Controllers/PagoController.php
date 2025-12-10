@@ -7,10 +7,24 @@ use App\Models\Pago;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf; // Asegúrate de importar esto
+use Barryvdh\DomPDF\Facade\Pdf; 
 
 class PagoController extends Controller
 {
+    /**
+     * Registra el pago de una ÚNICA cuota.
+     * * Utiliza DB Transaction y lockForUpdate para prevenir doble pago
+     * simultáneo. Genera un recibo PDF automáticamente.
+     *
+     * @param Request $request
+     * - cuota_id (int): ID de la cuota a pagar.
+     * - monto (float): Cantidad abonada (puede ser parcial).
+     * - forma_pago (string): 'Efectivo', 'Transferencia', etc.
+     * * @return \Illuminate\Http\JsonResponse
+     * - mensaje, nuevo_saldo, estado_cuota, url_pdf
+     * @throws \Exception Si ocurre error en DB o generación de PDF.
+     */
+
     public function store(Request $request)
     {
         // 1. Validamos
@@ -76,6 +90,19 @@ class PagoController extends Controller
         }
     }
 
+    /**
+     * Registra un pago global que cubre MÚLTIPLES cuotas.
+     * * Implementa lógica de "Cascada" (Waterfall): El dinero ingresado
+     * va cubriendo las cuotas más antiguas primero hasta agotarse.
+     *
+     * @param Request $request
+     * - cuota_ids (array): Lista de IDs de cuotas a pagar.
+     * - monto_recibido (float): Total de dinero entregado por el cliente.
+     * - forma_pago (string).
+     * - observacion (string|null).
+     * * @return \Illuminate\Http\JsonResponse URL del PDF unificado.
+     */
+
     public function storeMultiple(Request $request)
     {
         $request->validate([
@@ -87,7 +114,7 @@ class PagoController extends Controller
 
         return DB::transaction(function () use ($request) {
             
-            // Traer cuotas ordenadas (cronológicamente)
+            // Traer cuotas ordenadas (cronologicamente)
             $cuotas = Cuota::whereIn('id', $request->cuota_ids)
                         ->orderBy('periodo', 'asc')
                         ->get();
@@ -101,7 +128,6 @@ class PagoController extends Controller
                 'codigo_comprobante' => 'REC-' . time()
             ]);
 
-            // LÓGICA DE CASCADA DETALLADA
             $dineroDisponible = $request->monto_recibido;
             $cuotasParaRecibo = collect(); 
 
@@ -113,7 +139,6 @@ class PagoController extends Controller
                 $montoAbonadoHoy = 0;
 
                 if ($dineroDisponible >= $deudaOriginal) {
-                    // PAGO TOTAL DE LA CUOTA
                     $montoAbonadoHoy = $deudaOriginal;
                     
                     $cuota->update([
@@ -121,7 +146,6 @@ class PagoController extends Controller
                         'estado' => 'PAGADO'
                     ]);
                 } else {
-                    // PAGO PARCIAL
                     $montoAbonadoHoy = $dineroDisponible;
                     $nuevoSaldo = $deudaOriginal - $dineroDisponible;
                     
@@ -132,9 +156,6 @@ class PagoController extends Controller
                 }
 
                 $dineroDisponible -= $montoAbonadoHoy;
-
-                // --- TRUCO MAGICO ---
-                // Agregamos propiedades temporales al objeto cuota solo para el PDF
                 $cuota->detalle_pago_hoy = $montoAbonadoHoy;
                 $cuota->detalle_saldo_restante = $cuota->saldo_pendiente;
                 $cuota->detalle_total_cuota = $cuota->monto_total;
@@ -142,10 +163,8 @@ class PagoController extends Controller
                 $cuotasParaRecibo->push($cuota);
             }
 
-            // Generar PDF
             $contrato = $cuotas->first()->contrato;
             
-            // Pasamos la colección enriquecida con los detalles
             $pdf = Pdf::loadView('pdf.recibo', [
                 'pago' => $pago, 
                 'cuotas' => $cuotasParaRecibo, 

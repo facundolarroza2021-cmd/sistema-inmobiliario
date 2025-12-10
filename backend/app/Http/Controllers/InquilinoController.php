@@ -5,6 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Inquilino;
 use Illuminate\Http\Request;
 
+/**
+ * Class InquilinoController
+ * * CRUD básico para la gestión de inquilinos.
+ * La lógica compleja de inquilinos suele delegarse a los Contratos.
+ */
+
 class InquilinoController extends Controller
 {
     public function index()
