@@ -14,6 +14,13 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        User::create([
+            'name' => 'Admin Sistema',
+            'email' => 'admin@test.com',
+            'role' => 'admin',
+            'activo' => true,
+            'password' => 'password123' 
+        ]);
         // 1. PROPIETARIOS
         $prop1 = Propietario::create([
             'nombre_completo' => 'Roberto Dueñas (VIP)',
