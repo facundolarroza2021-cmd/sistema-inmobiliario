@@ -2,84 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\GastoService;
 use Illuminate\Http\Request;
-use App\Models\Gasto;
-use App\Models\Propiedad;
-use App\Models\Contrato;
-use App\Models\Cuota;
-use Carbon\Carbon;
 
 class GastoController extends Controller
 {
-    // Listar gastos de una propiedad (para la pestaña del detalle)
+    protected $gastoService;
+
+    public function __construct(GastoService $gastoService)
+    {
+        $this->gastoService = $gastoService;
+    }
+
     public function byPropiedad($id)
     {
-        return Gasto::where('propiedad_id', $id)
-                    ->orderBy('fecha', 'desc')
-                    ->get();
+        return response()->json($this->gastoService->listarPorPropiedad($id));
     }
 
     public function store(Request $request)
     {
-        // 1. Validaciones (Las que ya tenías)
-        $request->validate([
+        $validated = $request->validate([
             'propiedad_id' => 'required|exists:propiedades,id',
             'concepto' => 'required|string',
             'monto' => 'required|numeric|min:0',
             'fecha' => 'required|date',
-            'responsable' => 'required|string'
+            'responsable' => 'required|string|in:PROPIETARIO,INQUILINO,INMOBILIARIA'
         ]);
 
-        // 2. Crear el Gasto
-        $gasto = Gasto::create($request->all());
+        $gasto = $this->gastoService->crearGasto($validated);
 
-        // 3. --- AUTOMATIZACIÓN DE DEUDA (MAGIA) ---
-        // Si el gasto lo paga el INQUILINO, impactamos en su Cuota.
-        if ($request->responsable === 'INQUILINO') {
-            
-            // A. Buscar contrato activo de esta propiedad
-            $contrato = Contrato::where('propiedad_id', $request->propiedad_id)
-                                ->where('activo', true)
-                                ->first();
-
-            if ($contrato) {
-                // B. Determinar a qué periodo corresponde el gasto (Año-Mes)
-                // Ej: Si el gasto es del 15/12/2025, impacta en la cuota "2025-12"
-                $periodo = Carbon::parse($request->fecha)->format('Y-m');
-
-                // C. Buscar la cuota de ese mes
-                $cuota = Cuota::where('contrato_id', $contrato->id)
-                              ->where('periodo', $periodo)
-                              ->first();
-
-                if ($cuota) {
-                    // D. Actualizar la cuota
-                    $cuota->monto_gastos += $gasto->monto;       // Sumamos al acumulador de gastos
-                    $cuota->saldo_pendiente += $gasto->monto;    // Aumentamos la deuda total
-                    
-                    // Si la cuota ya estaba PAGADA, la volvemos a abrir porque ahora debe plata nueva
-                    if ($cuota->saldo_pendiente > 0) {
-                         $cuota->estado = 'PENDIENTE'; // O 'PARCIAL' si quieres
-                    }
-                    
-                    $cuota->save();
-                }
-            }
-        }
-
-        return response()->json($gasto);
+        return response()->json($gasto, 201);
     }
 
-    // Borrar gasto (Solo si no está liquidado aún)
     public function destroy($id)
     {
-        $gasto = Gasto::findOrFail($id);
-        
-        if ($gasto->liquidacion_id) {
-            return response()->json(['error' => 'No se puede borrar un gasto ya liquidado'], 400);
+        try {
+            $this->gastoService->eliminarGasto($id);
+            return response()->json(['message' => 'Gasto eliminado correctamente']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
-
-        $gasto->delete();
-        return response()->json(['message' => 'Gasto eliminado']);
     }
 }

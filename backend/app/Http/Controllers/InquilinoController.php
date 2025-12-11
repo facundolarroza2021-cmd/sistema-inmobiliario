@@ -2,52 +2,52 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Inquilino;
+use App\Services\InquilinoService;
 use Illuminate\Http\Request;
-
-/**
- * Class InquilinoController
- * * CRUD básico para la gestión de inquilinos.
- * La lógica compleja de inquilinos suele delegarse a los Contratos.
- */
 
 class InquilinoController extends Controller
 {
+    protected $inquilinoService;
+
+    public function __construct(InquilinoService $inquilinoService)
+    {
+        $this->inquilinoService = $inquilinoService;
+    }
+
     public function index()
     {
-        return Inquilino::all();
+        return response()->json($this->inquilinoService->listarTodos());
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre_completo' => 'required',
-            'dni' => 'required|unique:inquilinos',
-            'telefono' => 'required'
+        $validated = $request->validate([
+            'nombre_completo' => 'required|string',
+            'dni' => 'required|string|unique:inquilinos',
+            'telefono' => 'required|string',
+            'email' => 'nullable|email'
         ]);
 
-        $inquilino = Inquilino::create($request->all());
-
+        $inquilino = $this->inquilinoService->crearInquilino($validated);
         return response()->json($inquilino, 201);
     }
-    public function update(Request $request, $id){
-        $inquilino = Inquilino::find($id);
-        if (!$inquilino) return response()->json(['message' => 'No encontrado'], 404);
 
-        $request->validate([
-            'nombre_completo' => 'required',
-            'dni' => 'required|unique:inquilinos,dni,' . $id // Excluir su propio ID de la validación
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'nombre_completo' => 'required|string',
+            'dni' => 'required|string|unique:inquilinos,dni,' . $id,
+            'telefono' => 'required|string',
+            'email' => 'nullable|email'
         ]);
 
-        $inquilino->update($request->all());
+        $inquilino = $this->inquilinoService->actualizarInquilino($id, $validated);
         return response()->json($inquilino);
     }
 
-    public function destroy($id){
-        $inquilino = Inquilino::find($id);
-        if (!$inquilino) return response()->json(['message' => 'No encontrado'], 404);
-
-        $inquilino->delete();
-        return response()->json(['message' => 'Inquilino eliminado']);
+    public function destroy($id)
+    {
+        $this->inquilinoService->eliminarInquilino($id);
+        return response()->json(['message' => 'Inquilino eliminado correctamente']);
     }
 }

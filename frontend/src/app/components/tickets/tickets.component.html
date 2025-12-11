@@ -1,0 +1,132 @@
+<div class="main-container">
+
+    <div class="header-section">
+      <div>
+        <h1>Centro de Mantenimiento</h1>
+        <p>Control de incidencias y reparaciones</p>
+      </div>
+      <button mat-raised-button color="primary" (click)="mostrarFormulario = !mostrarFormulario">
+        <mat-icon>add</mat-icon> NUEVO RECLAMO
+      </button>
+    </div>
+  
+    @if (mostrarFormulario) {
+      <mat-card class="form-card">
+        <mat-card-content>
+          <form [formGroup]="ticketForm" (ngSubmit)="onSubmit()" class="form-row">
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Propiedad</mat-label>
+              <mat-select formControlName="propiedad_id">
+                @for (prop of propiedades; track prop.id) {
+                  <mat-option [value]="prop.id">{{ prop.direccion }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+  
+            <mat-form-field appearance="outline" class="flex-2">
+              <mat-label>Asunto</mat-label>
+              <input matInput formControlName="titulo" placeholder="Ej: Filtración en techo">
+            </mat-form-field>
+  
+            <mat-form-field appearance="outline">
+              <mat-label>Prioridad</mat-label>
+              <mat-select formControlName="prioridad">
+                <mat-option value="BAJA">Baja</mat-option>
+                <mat-option value="MEDIA">Media</mat-option>
+                <mat-option value="ALTA">Alta</mat-option>
+                <mat-option value="URGENTE">Urgente</mat-option>
+              </mat-select>
+            </mat-form-field>
+  
+            <div class="btn-group">
+              <button mat-stroked-button type="button" (click)="mostrarFormulario=false">Cancelar</button>
+              <button mat-flat-button color="primary" type="submit" [disabled]="ticketForm.invalid">Guardar</button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    }
+  
+    <div class="filters-bar">
+      <mat-chip-listbox>
+        <mat-chip-option [selected]="filtroEstado === 'TODOS'" (click)="filtrar('TODOS')">Todos</mat-chip-option>
+        <mat-chip-option color="warn" [selected]="filtroEstado === 'PENDIENTE'" (click)="filtrar('PENDIENTE')">Pendientes</mat-chip-option>
+        <mat-chip-option color="accent" [selected]="filtroEstado === 'EN_PROCESO'" (click)="filtrar('EN_PROCESO')">En Proceso</mat-chip-option>
+        <mat-chip-option color="primary" [selected]="filtroEstado === 'RESUELTO'" (click)="filtrar('RESUELTO')">Resueltos</mat-chip-option>
+      </mat-chip-listbox>
+    </div>
+  
+    <div class="table-container mat-elevation-z2">
+      <table mat-table [dataSource]="dataSource">
+  
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef> Estado </th>
+          <td mat-cell *matCellDef="let row">
+            <span class="status-badge" [ngClass]="row.estado">{{row.estado.replace('_', ' ')}}</span>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="prioridad">
+          <th mat-header-cell *matHeaderCellDef> Prioridad </th>
+          <td mat-cell *matCellDef="let row">
+            <div class="priority-dot" [ngClass]="row.prioridad" [title]="row.prioridad"></div>
+            <span class="small-text">{{row.prioridad}}</span>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef> Fecha </th>
+          <td mat-cell *matCellDef="let row"> {{row.created_at | date:'dd/MM/yy'}} </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="propiedad">
+          <th mat-header-cell *matHeaderCellDef> Propiedad </th>
+          <td mat-cell *matCellDef="let row"> 
+            <span style="font-weight: 500;">{{row.propiedad?.direccion}}</span>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="titulo">
+          <th mat-header-cell *matHeaderCellDef> Asunto </th>
+          <td mat-cell *matCellDef="let row"> 
+            {{row.titulo}} 
+            <div class="desc-text" *ngIf="row.descripcion">{{row.descripcion}}</div>
+          </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef> </th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="cambiarEstado(row, 'PENDIENTE')">
+                 <mat-icon>schedule</mat-icon> Marcar Pendiente
+              </button>
+              <button mat-menu-item (click)="cambiarEstado(row, 'EN_PROCESO')">
+                 <mat-icon>engineering</mat-icon> En Proceso
+              </button>
+              <button mat-menu-item (click)="cambiarEstado(row, 'RESUELTO')">
+                 <mat-icon>check_circle</mat-icon> Finalizar
+              </button>
+              <mat-divider></mat-divider>
+              <button mat-menu-item (click)="eliminar(row.id)">
+                 <mat-icon color="warn">delete</mat-icon> Eliminar
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+  
+      <div *ngIf="dataSource.data.length === 0" class="no-data">
+        <mat-icon>inbox</mat-icon>
+        <p>No hay reclamos registrados.</p>
+      </div>
+    </div>
+  
+  </div>

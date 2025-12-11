@@ -143,4 +143,20 @@ export class ApiService {
   eliminarMovimientoCaja(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/caja/${id}`);
   }
+  // --- MANTENIMIENTO / TICKETS ---
+  getTickets(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/tickets`);
+  }
+
+  crearTicket(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/tickets`, data);
+  }
+
+  actualizarTicket(id: number, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/tickets/${id}`, data);
+  }
+
+  eliminarTicket(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/tickets/${id}`);
+  }
 }

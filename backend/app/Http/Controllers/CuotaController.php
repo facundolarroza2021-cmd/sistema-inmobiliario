@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cuota;
+use App\Services\CuotaService;
 use Illuminate\Http\Request;
 
 class CuotaController extends Controller
 {
+    protected $cuotaService;
+
+    public function __construct(CuotaService $cuotaService)
+    {
+        $this->cuotaService = $cuotaService;
+    }
+
     public function index()
     {
-        return Cuota::with(['contrato.inquilino', 'contrato.propiedad', 'pagos'])
-                    ->orderBy('id', 'desc')
-                    ->get();
+        return response()->json($this->cuotaService->listarCuotas());
     }
 }

@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LiquidacionController;
 use App\Http\Controllers\GastoController;
 use App\Http\Controllers\CajaController;
+use App\Http\Controllers\TicketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +66,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/caja', [CajaController::class, 'index']); 
         Route::post('/caja', [CajaController::class, 'store']); 
         Route::get('/caja/balance', [CajaController::class, 'balance']);
+
+        Route::get('/tickets', [TicketController::class, 'index']);
+        Route::post('/tickets', [TicketController::class, 'store']);
+        Route::put('/tickets/{id}', [TicketController::class, 'update']);
+        Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
     });
 
     //  COBRADORES ---
