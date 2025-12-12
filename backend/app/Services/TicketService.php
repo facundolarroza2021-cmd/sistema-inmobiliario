@@ -31,11 +31,11 @@ class TicketService
     public function actualizarTicket(int $id, array $datos): Ticket
     {
         $ticket = Ticket::findOrFail($id);
-        
+
         $ticket->update([
             'estado' => $datos['estado'] ?? $ticket->estado,
             'prioridad' => $datos['prioridad'] ?? $ticket->prioridad,
-            'descripcion' => $datos['descripcion'] ?? $ticket->descripcion
+            'descripcion' => $datos['descripcion'] ?? $ticket->descripcion,
         ]);
 
         return $ticket;

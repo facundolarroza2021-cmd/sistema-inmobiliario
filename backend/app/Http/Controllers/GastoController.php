@@ -26,7 +26,7 @@ class GastoController extends Controller
             'concepto' => 'required|string',
             'monto' => 'required|numeric|min:0',
             'fecha' => 'required|date',
-            'responsable' => 'required|string|in:PROPIETARIO,INQUILINO,INMOBILIARIA'
+            'responsable' => 'required|string|in:PROPIETARIO,INQUILINO,INMOBILIARIA',
         ]);
 
         $gasto = $this->gastoService->crearGasto($validated);
@@ -38,6 +38,7 @@ class GastoController extends Controller
     {
         try {
             $this->gastoService->eliminarGasto($id);
+
             return response()->json(['message' => 'Gasto eliminado correctamente']);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);

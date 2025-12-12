@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Gasto;
 use App\Models\Liquidacion;
 use App\Models\Propietario;
-use App\Models\Gasto;
 use Exception;
 
 class LiquidacionService
@@ -17,17 +17,17 @@ class LiquidacionService
 
         $comision = $totalIngresos * 0.10;
         $idsPropiedades = $propietario->propiedades->pluck('id');
-        
+
         $gastosPendientes = Gasto::whereIn('propiedad_id', $idsPropiedades)
-                                 ->whereNull('liquidacion_id')
-                                 ->get();
+            ->whereNull('liquidacion_id')
+            ->get();
 
         $totalGastos = $gastosPendientes->sum('monto');
 
         $montoPagar = $totalIngresos - $comision - $totalGastos;
 
         if ($montoPagar < 0) {
-            throw new Exception("El saldo es negativo. No se puede liquidar.");
+            throw new Exception('El saldo es negativo. No se puede liquidar.');
         }
 
         $liquidacion = Liquidacion::create([
@@ -36,7 +36,7 @@ class LiquidacionService
             'monto_total' => $totalIngresos,
             'monto_comision' => $comision,
             'monto_gastos' => $totalGastos,
-            'monto_entregado' => $montoPagar
+            'monto_entregado' => $montoPagar,
         ]);
 
         foreach ($gastosPendientes as $gasto) {
@@ -46,7 +46,7 @@ class LiquidacionService
 
         return $liquidacion;
     }
-    
+
     public function listarLiquidaciones()
     {
         return Liquidacion::with('propietario')->orderBy('id', 'desc')->get();

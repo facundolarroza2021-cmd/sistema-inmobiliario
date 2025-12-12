@@ -12,7 +12,7 @@ return new class extends Migration
             $table->softDeletes(); // Esto agrega la columna 'deleted_at'
         });
     }
-    
+
     public function down(): void
     {
         Schema::table('inquilinos', function (Blueprint $table) {

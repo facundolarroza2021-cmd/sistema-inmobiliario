@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Gasto;
 use App\Models\Contrato;
 use App\Models\Cuota;
+use App\Models\Gasto;
 use Carbon\Carbon;
 use Exception;
 
@@ -13,8 +13,8 @@ class GastoService
     public function listarPorPropiedad(int $propiedadId)
     {
         return Gasto::where('propiedad_id', $propiedadId)
-                    ->orderBy('fecha', 'desc')
-                    ->get();
+            ->orderBy('fecha', 'desc')
+            ->get();
     }
 
     public function crearGasto(array $datos): Gasto
@@ -33,7 +33,7 @@ class GastoService
         $gasto = Gasto::findOrFail($id);
 
         if ($gasto->liquidacion_id) {
-            throw new Exception("No se puede borrar un gasto ya liquidado al propietario.");
+            throw new Exception('No se puede borrar un gasto ya liquidado al propietario.');
         }
 
         $gasto->delete();
@@ -45,16 +45,18 @@ class GastoService
     private function impactarEnCuota(Gasto $gasto): void
     {
         $contrato = Contrato::where('propiedad_id', $gasto->propiedad_id)
-                            ->where('activo', true)
-                            ->first();
+            ->where('activo', true)
+            ->first();
 
-        if (!$contrato) return;
+        if (! $contrato) {
+            return;
+        }
 
         $periodo = Carbon::parse($gasto->fecha)->format('Y-m');
 
         $cuota = Cuota::where('contrato_id', $contrato->id)
-                      ->where('periodo', $periodo)
-                      ->first();
+            ->where('periodo', $periodo)
+            ->first();
 
         if ($cuota) {
             $cuota->monto_gastos += $gasto->monto;

@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Models\Contrato;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\UploadedFile;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 
 class ContratoService
 {
@@ -19,7 +19,7 @@ class ContratoService
     public function crearContratoCompleto(array $datos, ?UploadedFile $archivo = null): Contrato
     {
         return DB::transaction(function () use ($datos, $archivo) {
-            
+
             $rutaArchivo = $archivo ? $archivo->store('contratos', 'public') : null;
 
             $inicio = Carbon::parse($datos['fecha_inicio']);
@@ -34,10 +34,10 @@ class ContratoService
                 'fecha_fin' => $fin->format('Y-m-d'),
                 'dia_vencimiento' => (int) $datos['dia_vencimiento'],
                 'activo' => true,
-                'archivo_url' => $rutaArchivo
+                'archivo_url' => $rutaArchivo,
             ]);
 
-            if (!empty($datos['garantes'])) {
+            if (! empty($datos['garantes'])) {
                 $garantes = is_string($datos['garantes']) ? json_decode($datos['garantes'], true) : $datos['garantes'];
                 foreach ($garantes as $g) {
                     $contrato->garantes()->create([
@@ -45,14 +45,14 @@ class ContratoService
                         'dni' => $g['dni'],
                         'telefono' => $g['telefono'] ?? null,
                         'tipo_garantia' => $g['tipo'],
-                        'detalle_garantia' => $g['detalle'] ?? null
+                        'detalle_garantia' => $g['detalle'] ?? null,
                     ]);
                 }
             }
 
             $this->cuotaService->generarCuotasParaContrato(
-                $contrato, 
-                $meses, 
+                $contrato,
+                $meses,
                 (int) $datos['dia_vencimiento']
             );
 
@@ -63,8 +63,8 @@ class ContratoService
     public function listarContratos()
     {
         return Contrato::with(['inquilino', 'propiedad', 'garantes'])
-                    ->orderBy('id', 'desc')
-                    ->get();
+            ->orderBy('id', 'desc')
+            ->get();
     }
 
     public function finalizarContrato(int $id): void

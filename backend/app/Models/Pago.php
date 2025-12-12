@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Pago extends Model
 {
@@ -13,7 +14,7 @@ class Pago extends Model
         'fecha_pago' => 'datetime',
     ];
 
-    public function cuota()
+    public function cuota(): BelongsTo
     {
         return $this->belongsTo(Cuota::class);
     }

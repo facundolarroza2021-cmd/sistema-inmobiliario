@@ -27,7 +27,7 @@ class CuotaService
                 'fecha_vencimiento' => $vencimiento->format('Y-m-d'),
                 'monto_original' => $contrato->monto_alquiler,
                 'saldo_pendiente' => $contrato->monto_alquiler,
-                'estado' => 'PENDIENTE'
+                'estado' => 'PENDIENTE',
             ]);
 
             $fechaAux->addMonth();
@@ -41,7 +41,7 @@ class CuotaService
     public function listarCuotas()
     {
         return Cuota::with(['contrato.inquilino', 'contrato.propiedad', 'pagos'])
-                    ->orderBy('id', 'desc')
-                    ->get();
+            ->orderBy('id', 'desc')
+            ->get();
     }
 }

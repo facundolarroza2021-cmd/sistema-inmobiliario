@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Pago;
 use App\Models\Cuota;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Pago;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PagoService
 {
@@ -17,15 +17,15 @@ class PagoService
     public function registrarPago(int $cuotaId, float $monto, string $formaPago): array
     {
         return DB::transaction(function () use ($cuotaId, $monto, $formaPago) {
-            
+
             $cuota = Cuota::lockForUpdate()->findOrFail($cuotaId);
 
             if ($cuota->estado === 'PAGADO') {
-                throw new Exception("Esta cuota ya está pagada.");
+                throw new Exception('Esta cuota ya está pagada.');
             }
 
             if ($monto > $cuota->saldo_pendiente) {
-                throw new Exception("El monto excede la deuda pendiente ($" . $cuota->saldo_pendiente . ")");
+                throw new Exception('El monto excede la deuda pendiente ($'.$cuota->saldo_pendiente.')');
             }
 
             $pago = Pago::create([
@@ -33,11 +33,11 @@ class PagoService
                 'monto_pagado' => $monto,
                 'fecha_pago' => now(),
                 'metodo_pago' => $formaPago,
-                'codigo_comprobante' => uniqid('REC-')
+                'codigo_comprobante' => uniqid('REC-'),
             ]);
 
             $nuevoSaldo = $cuota->saldo_pendiente - $monto;
-            
+
             $cuota->saldo_pendiente = $nuevoSaldo;
             $cuota->estado = ($nuevoSaldo <= 0) ? 'PAGADO' : 'PARCIAL';
             $cuota->save();
@@ -48,25 +48,29 @@ class PagoService
                 'pago' => $pago,
                 'nuevo_saldo' => $nuevoSaldo,
                 'estado_cuota' => $cuota->estado,
-                'url_pdf' => $urlPdf
+                'url_pdf' => $urlPdf,
             ];
         });
     }
 
     private function generarReciboPdf(Pago $pago, Cuota $cuota): string
-    {
-        $contrato = $cuota->contrato->load(['inquilino', 'propiedad']);
+        {
+            $contrato = $cuota->contrato;
+            
+            /** @var \App\Models\Contrato $contrato */
 
-        $pdf = Pdf::loadView('pdf.recibo', [
-            'pago' => $pago,
-            'cuota' => $cuota,
-            'contrato' => $contrato,
-            'inquilino' => $contrato->inquilino
-        ]);
+            $contrato->load(['inquilino', 'propiedad']);
 
-        $nombreArchivo = 'recibos/recibo_' . $pago->id . '_' . time() . '.pdf';
-        Storage::disk('public')->put($nombreArchivo, $pdf->output());
+            $pdf = Pdf::loadView('pdf.recibo', [
+                'pago' => $pago,
+                'cuota' => $cuota,
+                'contrato' => $contrato,
+                'inquilino' => $contrato->inquilino 
+            ]);
 
-        return asset('storage/' . $nombreArchivo);
-    }
+            $nombreArchivo = 'recibos/recibo_' . $pago->id . '_' . time() . '.pdf';
+            Storage::disk('public')->put($nombreArchivo, $pdf->output());
+
+            return asset('storage/' . $nombreArchivo);
+        }
 }

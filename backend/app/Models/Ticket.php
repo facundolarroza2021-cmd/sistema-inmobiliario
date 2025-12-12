@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Ticket extends Model
 {
@@ -15,15 +16,15 @@ class Ticket extends Model
         'titulo',
         'descripcion',
         'prioridad',
-        'estado'
+        'estado',
     ];
 
-    public function propiedad()
+    public function propiedad(): BelongsTo
     {
         return $this->belongsTo(Propiedad::class);
     }
 
-    public function inquilino()
+    public function inquilino(): BelongsTo
     {
         return $this->belongsTo(Inquilino::class);
     }

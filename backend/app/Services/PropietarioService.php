@@ -18,14 +18,14 @@ class PropietarioService
     {
         $propietario = Propietario::with([
             'propiedades.contratoActivo.inquilino',
-            'liquidaciones'
+            'liquidaciones',
         ])->findOrFail($id);
 
         $totalPropiedades = $propietario->propiedades->count();
         $propiedadesAlquiladas = $propietario->propiedades->whereNotNull('contratoActivo')->count();
-        
-        $tasaOcupacion = $totalPropiedades > 0 
-            ? round(($propiedadesAlquiladas / $totalPropiedades) * 100, 1) 
+
+        $tasaOcupacion = $totalPropiedades > 0
+            ? round(($propiedadesAlquiladas / $totalPropiedades) * 100, 1)
             : 0;
 
         return [
@@ -34,8 +34,8 @@ class PropietarioService
                 'total_propiedades' => $totalPropiedades,
                 'ocupacion' => $propiedadesAlquiladas,
                 'tasa_ocupacion_porcentaje' => $tasaOcupacion,
-                'saldo_pendiente' => 0
-            ]
+                'saldo_pendiente' => 0,
+            ],
         ];
     }
 
@@ -48,6 +48,7 @@ class PropietarioService
     {
         $propietario = Propietario::findOrFail($id);
         $propietario->update($datos);
+
         return $propietario;
     }
 

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->text('observacion')->nullable()->after('forma_pago');
         });
     }
-    
+
     public function down(): void
     {
         Schema::table('pagos', function (Blueprint $table) {

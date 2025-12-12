@@ -1,0 +1,724 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Sistema Inmobiliario",
+        "description": "Documentación de la API para gestión de propiedades, inquilinos y contratos.",
+        "contact": {
+            "email": "admin@test.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Iniciar sesión y obtener Token",
+                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@test.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login exitoso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login exitoso"
+                                        },
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "2|AbCdEf..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "user": {
+                                            "description": "Datos del usuario",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Administrador"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "admin@test.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "admin"
+                                                },
+                                                "activo": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciales incorrectas"
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Registrar un nuevo usuario",
+                "operationId": "8a56853624e025573120a09a4c75d468",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nuevo Usuario"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "usuario@test.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "admin"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario registrado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación (Email duplicado, pass corta, etc)"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Cerrar sesión (Invalidar Token)",
+                "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
+                "responses": {
+                    "200": {
+                        "description": "Logout exitoso"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/perfil": {
+            "get": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Obtener datos del usuario logueado",
+                "operationId": "f812ecf7f6db8245b4a29a8f216c0c16",
+                "responses": {
+                    "200": {
+                        "description": "Datos del usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "name": {
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "type": "string"
+                                        },
+                                        "role": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/inquilinos": {
+            "get": {
+                "tags": [
+                    "Inquilinos"
+                ],
+                "summary": "Listar todos los inquilinos",
+                "operationId": "89366977c743a1ab807e5674d9b999f4",
+                "responses": {
+                    "200": {
+                        "description": "Lista de inquilinos"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Inquilinos"
+                ],
+                "summary": "Registrar un nuevo inquilino",
+                "operationId": "0feb896b9f949b81450b32e6088f079b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nombre_completo",
+                                    "dni"
+                                ],
+                                "properties": {
+                                    "nombre_completo": {
+                                        "type": "string",
+                                        "example": "Carlos Pérez"
+                                    },
+                                    "dni": {
+                                        "type": "string",
+                                        "example": "30123456"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "carlos@mail.com"
+                                    },
+                                    "telefono": {
+                                        "type": "string",
+                                        "example": "3454123456"
+                                    },
+                                    "garante_nombre": {
+                                        "type": "string",
+                                        "example": "Padre de Carlos"
+                                    },
+                                    "garante_dni": {
+                                        "type": "string",
+                                        "example": "20123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Inquilino creado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/inquilinos/{id}": {
+            "put": {
+                "tags": [
+                    "Inquilinos"
+                ],
+                "summary": "Actualizar un inquilino existente",
+                "operationId": "fd19cef6415abc6dd6001a035b90993e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del inquilino",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nombre_completo": {
+                                        "type": "string"
+                                    },
+                                    "dni": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "telefono": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Inquilino actualizado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Inquilinos"
+                ],
+                "summary": "Eliminar un inquilino",
+                "operationId": "ad277b65fbd6b714ab24bfd356a6acf3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inquilino eliminado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/propiedades": {
+            "get": {
+                "tags": [
+                    "Propiedades"
+                ],
+                "summary": "Listar todas las propiedades",
+                "operationId": "1428dc672691f51f4a853ddcf6faff0e",
+                "responses": {
+                    "200": {
+                        "description": "Lista de propiedades recuperada con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "direccion": {
+                                                "type": "string",
+                                                "example": "Av. Siempre Viva 742"
+                                            },
+                                            "tipo": {
+                                                "type": "string",
+                                                "example": "Casa"
+                                            },
+                                            "estado": {
+                                                "type": "string",
+                                                "example": "Disponible"
+                                            },
+                                            "precio_alquiler": {
+                                                "type": "number",
+                                                "example": 150000
+                                            },
+                                            "propietario": {
+                                                "description": "Datos del dueño",
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Propiedades"
+                ],
+                "summary": "Crear una nueva propiedad",
+                "operationId": "8f14f04fae02e4fe798f67893120cbf3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "propietario_id",
+                                    "direccion",
+                                    "tipo"
+                                ],
+                                "properties": {
+                                    "propietario_id": {
+                                        "description": "ID del dueño existente",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "direccion": {
+                                        "type": "string",
+                                        "example": "Av. Siempre Viva 742"
+                                    },
+                                    "tipo": {
+                                        "type": "string",
+                                        "example": "Departamento"
+                                    },
+                                    "ambientes": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "precio_alquiler": {
+                                        "description": "Opcional",
+                                        "type": "number",
+                                        "example": null
+                                    },
+                                    "comision": {
+                                        "description": "Opcional",
+                                        "type": "number",
+                                        "example": null
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Propiedad creada con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Propiedad creada"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/propiedades/{id}": {
+            "get": {
+                "tags": [
+                    "Propiedades"
+                ],
+                "summary": "Obtener detalles de una propiedad",
+                "operationId": "14c81eabb4a966c2adf109f8a124407e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalles de la propiedad"
+                    },
+                    "404": {
+                        "description": "Propiedad no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Propiedades"
+                ],
+                "summary": "Eliminar una propiedad",
+                "operationId": "ac46a6152a7d0158329dd1adc227c8b5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la propiedad a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Propiedad eliminada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Propiedad eliminada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Propiedad no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/propiedades/{id}/fotos": {
+            "post": {
+                "tags": [
+                    "Propiedades"
+                ],
+                "summary": "Subir una foto a la propiedad",
+                "operationId": "7c50385197f4f61f32feb4e1414393fb",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la propiedad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Archivo de imagen",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "imagen": {
+                                        "description": "Archivo de imagen (jpg, png, jpeg)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Foto subida con éxito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "mensaje": {
+                                            "type": "string",
+                                            "example": "Foto subida"
+                                        },
+                                        "url": {
+                                            "type": "string",
+                                            "example": "http://localhost:8000/storage/propiedades/1/foto.jpg"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación (archivo muy grande o formato inválido)"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/propietarios": {
+            "get": {
+                "tags": [
+                    "Propietarios"
+                ],
+                "summary": "Listar todos los propietarios",
+                "operationId": "b82802e64cb713f06983662cc027c6f8",
+                "responses": {
+                    "200": {
+                        "description": "Operación exitosa"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Login con token Bearer",
+                "name": "Token de Acceso",
+                "in": "header",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Autenticación",
+            "description": "Autenticación"
+        },
+        {
+            "name": "Inquilinos",
+            "description": "Inquilinos"
+        },
+        {
+            "name": "Propiedades",
+            "description": "Propiedades"
+        },
+        {
+            "name": "Propietarios",
+            "description": "Propietarios"
+        }
+    ]
+}

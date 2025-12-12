@@ -1,0 +1,21 @@
+includes:
+    - vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    # Directorios que PHPStan va a analizar
+    paths:
+        - app/
+        - config/
+        - database/
+        - routes/
+    
+    # Nivel de análisis (0 = muy laxo, 9 = muy estricto)
+    # El nivel 5 es el estándar de la industria para proyectos Laravel existentes.
+    level: 5
+
+    # Excluir archivos específicos si te dan problemas (ej: tests viejos)
+    excludePaths:
+        # - tests/*
+
+    # Habilitar escaneo de propiedades mágicas de Eloquent
+    checkModelProperties: true

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->string('archivo_url')->nullable()->after('activo');
         });
     }
-    
+
     public function down(): void
     {
         Schema::table('contratos', function (Blueprint $table) {

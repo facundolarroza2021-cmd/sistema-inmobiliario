@@ -33,7 +33,7 @@ class CajaService
             'categoria' => $datos['categoria'],
             'monto' => $datos['monto'],
             'descripcion' => $datos['descripcion'] ?? null,
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
     }
 
@@ -60,7 +60,7 @@ class CajaService
         return [
             'ingresos' => $ingresos,
             'egresos' => $egresos,
-            'balance_neto' => $ingresos - $egresos
+            'balance_neto' => $ingresos - $egresos,
         ];
     }
 

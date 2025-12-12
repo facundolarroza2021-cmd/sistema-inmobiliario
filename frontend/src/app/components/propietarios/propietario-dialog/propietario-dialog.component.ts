@@ -30,33 +30,41 @@ export class PropietarioDialogComponent implements OnInit {
   ) {}
 
   guardar() {
-    // Validar campos básicos
-    if (!this.nuevoPropietario.nombre_completo || !this.nuevoPropietario.dni) {
-      this.mensaje.error('Nombre y DNI son obligatorios');
-      return;
-    }
+      // Validar campos básicos
+      if (!this.nuevoPropietario.nombre_completo || !this.nuevoPropietario.dni) {
+        this.mensaje.error('Nombre y DNI son obligatorios');
+        return;
+      }
 
-    if (this.data) {
-      // --- LÓGICA DE EDICIÓN ---
-      this.api.editarPropietario(this.data.id, this.nuevoPropietario).subscribe({
-        next: () => {
-          this.mensaje.exito('Propietario actualizado');
-          this.dialogRef.close(true); // Avisamos que hubo cambios
-        },
-        error: (err) => this.mensaje.error('Error al actualizar (¿DNI duplicado?)')
-      });
+      // --- CORRECCIÓN: Forzamos que el DNI sea String ---
+      const datosParaEnviar = {
+        ...this.nuevoPropietario,
+        dni: this.nuevoPropietario.dni.toString() // <--- ¡Esto soluciona el error!
+      };
 
-    } else {
-      // --- LÓGICA DE CREACIÓN (La que ya tenías) ---
-      this.api.crearPropietario(this.nuevoPropietario).subscribe({
-        next: () => {
-          this.mensaje.exito('Propietario creado');
-          this.dialogRef.close(true);
-        },
-        error: () => this.mensaje.error('Error al crear')
-      });
+      if (this.data) {
+        // --- LÓGICA DE EDICIÓN ---
+        // Usamos datosParaEnviar en lugar de this.nuevoPropietario
+        this.api.editarPropietario(this.data.id, datosParaEnviar).subscribe({
+          next: () => {
+            this.mensaje.exito('Propietario actualizado');
+            this.dialogRef.close(true); 
+          },
+          error: (err) => this.mensaje.error('Error al actualizar (¿DNI duplicado?)')
+        });
+
+      } else {
+        // --- LÓGICA DE CREACIÓN ---
+        // Usamos datosParaEnviar
+        this.api.crearPropietario(datosParaEnviar).subscribe({
+          next: () => {
+            this.mensaje.exito('Propietario creado');
+            this.dialogRef.close(true);
+          },
+          error: () => this.mensaje.error('Error al crear')
+        });
+      }
     }
-  }
 
   ngOnInit(): void {
     if (this.data) {

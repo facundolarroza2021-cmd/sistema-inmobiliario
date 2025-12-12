@@ -13,7 +13,7 @@ return new class extends Migration
             $table->decimal('monto_gastos', 10, 2)->default(0)->after('monto_original');
         });
     }
-    
+
     public function down(): void
     {
         Schema::table('cuotas', function (Blueprint $table) {

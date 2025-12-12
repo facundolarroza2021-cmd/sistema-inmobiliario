@@ -24,7 +24,7 @@ class AuthService
         }
 
         // 2. Validar Estado
-        if ($user->activo === 0 || $user->activo === false) {
+        if ( $user->activo === false) {
             throw new \Exception('Usuario desactivado. Contacte al administrador.', 403);
         }
 
@@ -35,7 +35,7 @@ class AuthService
         return [
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'user' => $user
+            'user' => $user,
         ];
     }
 

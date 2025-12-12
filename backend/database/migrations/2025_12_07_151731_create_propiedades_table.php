@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('propietario_id')->constrained('propietarios')->onDelete('cascade');
             $table->string('direccion');
-            $table->string('tipo'); // Casa, Depto, Local
-            $table->decimal('comision', 5, 2); // Porcentaje (ej: 10.00)
+            $table->string('tipo');
+            $table->decimal('precio_alquiler', 10, 2)->nullable();
+            $table->decimal('comision', 5, 2)->nullable();
             $table->boolean('disponible')->default(true);
             $table->timestamps();
         });

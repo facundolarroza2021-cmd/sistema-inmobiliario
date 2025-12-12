@@ -25,22 +25,25 @@ class TicketController extends Controller
             'propiedad_id' => 'required|exists:propiedades,id',
             'titulo' => 'required|string|max:255',
             'prioridad' => 'required|in:BAJA,MEDIA,ALTA,URGENTE',
-            'descripcion' => 'nullable|string'
+            'descripcion' => 'nullable|string',
         ]);
 
         $ticket = $this->ticketService->crearTicket($validated);
+
         return response()->json($ticket, 201);
     }
 
     public function update(Request $request, $id)
     {
         $ticket = $this->ticketService->actualizarTicket($id, $request->all());
+
         return response()->json($ticket);
     }
 
     public function destroy($id)
     {
         $this->ticketService->eliminarTicket($id);
+
         return response()->json(['message' => 'Ticket eliminado']);
     }
 }

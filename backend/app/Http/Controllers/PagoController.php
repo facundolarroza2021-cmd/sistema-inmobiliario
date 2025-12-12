@@ -19,7 +19,7 @@ class PagoController extends Controller
         $request->validate([
             'cuota_id' => 'required|exists:cuotas,id',
             'monto' => 'required|numeric|min:1',
-            'forma_pago' => 'required|string'
+            'forma_pago' => 'required|string',
         ]);
 
         try {
@@ -31,7 +31,7 @@ class PagoController extends Controller
 
             return response()->json([
                 'mensaje' => 'Pago registrado correctamente',
-                'detalle' => $resultado
+                'detalle' => $resultado,
             ]);
 
         } catch (\Exception $e) {

@@ -41,16 +41,22 @@ export class InquilinoDialogComponent implements OnInit {
       return;
     }
 
+    // --- PARCHE: Convertir DNI a String antes de enviar ---
+    const datosParaEnviar = {
+      ...this.nuevoInquilino,
+      dni: this.nuevoInquilino.dni.toString() // <--- ESTO SOLUCIONA EL ERROR
+    };
+
     if (this.data) {
-      // --- (PUT) ---
-      this.api.editarInquilino(this.data.id, this.nuevoInquilino).subscribe(() => {
+      // Usar datosParaEnviar en vez de this.nuevoInquilino
+      this.api.editarInquilino(this.data.id, datosParaEnviar).subscribe(() => {
         this.mensaje.exito('Inquilino actualizado');
         this.dialogRef.close(true);
       }, (err) => this.mensaje.error(err.error.message || err.message));
 
     } else {
-      // ---(POST) ---
-      this.api.crearInquilino(this.nuevoInquilino).subscribe(() => {
+      // Usar datosParaEnviar
+      this.api.crearInquilino(datosParaEnviar).subscribe(() => {
         this.mensaje.exito('Inquilino registrado');
         this.dialogRef.close(true);
       }, (err) => this.mensaje.error(err.error.message || err.message));

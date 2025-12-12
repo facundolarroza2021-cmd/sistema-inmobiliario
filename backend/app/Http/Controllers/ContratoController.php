@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\ContratoService;
+use Illuminate\Http\Request;
 
 class ContratoController extends Controller
 {
@@ -30,7 +30,7 @@ class ContratoController extends Controller
             'dia_vencimiento' => 'required|integer|min:1|max:31',
             'meses' => 'nullable|integer|min:1',
             'archivo' => 'nullable|file|mimes:pdf,jpg,png|max:10240',
-            'garantes' => 'nullable'
+            'garantes' => 'nullable',
         ]);
 
         try {
@@ -40,12 +40,12 @@ class ContratoController extends Controller
             );
 
             return response()->json([
-                'message' => 'Contrato creado exitosamente', 
-                'contrato' => $contrato
+                'message' => 'Contrato creado exitosamente',
+                'contrato' => $contrato,
             ], 201);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error al crear contrato: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Error al crear contrato: '.$e->getMessage()], 500);
         }
     }
 
@@ -53,6 +53,7 @@ class ContratoController extends Controller
     {
         try {
             $this->contratoService->finalizarContrato($id);
+
             return response()->json(['message' => 'Contrato finalizado correctamente']);
         } catch (\Exception $e) {
             return response()->json(['message' => 'No se pudo finalizar el contrato'], 404);

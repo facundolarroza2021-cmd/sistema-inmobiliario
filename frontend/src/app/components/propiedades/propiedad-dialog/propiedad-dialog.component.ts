@@ -27,7 +27,7 @@ export class PropiedadDialogComponent implements OnInit {
   private mensaje = inject(MensajeService);
 
   // Variables del formulario
-  nuevaPropiedad = { direccion: '', tipo: 'Casa', propietario_id: null, comision: 10 };
+  nuevaPropiedad = { direccion: '', tipo: 'Casa', propietario_id: null};
   listaPropietarios: any[] = [];
 
   constructor(
@@ -43,8 +43,6 @@ export class PropiedadDialogComponent implements OnInit {
       this.nuevaPropiedad = { 
         direccion: this.data.direccion,
         tipo: this.data.tipo,
-        comision: this.data.comision,
-        // TRUCO: Si viene el objeto propietario, sacamos su ID. Si no, usamos el ID directo.
         propietario_id: this.data.propietario ? this.data.propietario.id : this.data.propietario_id
       };
     }

@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('codigo_comprobante')->nullable()->after('forma_pago');
         });
     }
-    
+
     public function down(): void
     {
         Schema::table('pagos', function (Blueprint $table) {

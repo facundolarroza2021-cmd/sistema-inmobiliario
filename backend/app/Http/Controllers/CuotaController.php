@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\CuotaService;
-use Illuminate\Http\Request;
 
 class CuotaController extends Controller
 {

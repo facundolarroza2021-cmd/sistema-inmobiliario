@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
  * posee los privilegios necesarios para acceder a la ruta solicitada.
  * Implementa una jerarquía donde el rol 'admin' tiene acceso total.
  */
-
 class CheckRole
 {
     public function handle(Request $request, Closure $next, ...$roles): Response

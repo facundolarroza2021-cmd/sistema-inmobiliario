@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Propiedad;
 use App\Models\PropiedadImagen;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class PropiedadService
 {
@@ -18,8 +17,13 @@ class PropiedadService
     {
         $propiedad = Propiedad::with(['propietario', 'contratos.inquilino', 'imagenes'])->findOrFail($id);
         
-        // Transformar URLs de imágenes
+        
+        /** @var \App\Models\Propiedad $propiedad */
+
+       
+        
         foreach ($propiedad->imagenes as $img) {
+            /** @var \App\Models\PropiedadImagen $img */
             $img->url = asset('storage/' . $img->ruta_archivo);
         }
         
@@ -34,20 +38,20 @@ class PropiedadService
     public function subirFoto(int $id, UploadedFile $archivo)
     {
         $propiedad = Propiedad::findOrFail($id);
-        
+
         $path = $archivo->store('propiedades', 'public');
 
         $imagen = PropiedadImagen::create([
             'propiedad_id' => $propiedad->id,
-            'ruta_archivo' => $path
+            'ruta_archivo' => $path,
         ]);
 
         return [
             'id' => $imagen->id,
-            'url' => asset('storage/' . $path)
+            'url' => asset('storage/'.$path),
         ];
     }
-    
+
     public function eliminarPropiedad(int $id): void
     {
         $propiedad = Propiedad::findOrFail($id);

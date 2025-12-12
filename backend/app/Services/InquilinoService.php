@@ -20,6 +20,7 @@ class InquilinoService
     {
         $inquilino = Inquilino::findOrFail($id);
         $inquilino->update($datos);
+
         return $inquilino;
     }
 

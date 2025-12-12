@@ -23,7 +23,7 @@ class LiquidacionController extends Controller
     {
         $request->validate([
             'propietario_id' => 'required|exists:propietarios,id',
-            'periodo' => 'required|date_format:Y-m' // "2025-01"
+            'periodo' => 'required|date_format:Y-m', // "2025-01"
         ]);
 
         try {
@@ -34,7 +34,7 @@ class LiquidacionController extends Controller
 
             return response()->json([
                 'message' => 'Liquidación generada exitosamente',
-                'data' => $liquidacion
+                'data' => $liquidacion,
             ], 201);
 
         } catch (\Exception $e) {

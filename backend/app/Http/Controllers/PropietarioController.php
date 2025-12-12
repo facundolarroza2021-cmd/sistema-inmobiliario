@@ -5,6 +5,22 @@ namespace App\Http\Controllers;
 use App\Services\PropietarioService;
 use Illuminate\Http\Request;
 
+/**
+ * @OA\Get(
+ * path="/api/propietarios",
+ * summary="Listar todos los propietarios",
+ * tags={"Propietarios"},
+ *
+ * @OA\Response(
+ * response=200,
+ * description="Operación exitosa"
+ * ),
+ * @OA\Response(
+ * response=401,
+ * description="No autorizado"
+ * )
+ * )
+ */
 class PropietarioController extends Controller
 {
     protected $propietarioService;
@@ -31,10 +47,11 @@ class PropietarioController extends Controller
             'dni' => 'required|string|unique:propietarios',
             'email' => 'nullable|email',
             'telefono' => 'nullable|string',
-            'cbu' => 'nullable|string'
+            'cbu' => 'nullable|string',
         ]);
 
         $propietario = $this->propietarioService->crearPropietario($validated);
+
         return response()->json($propietario, 201);
     }
 
@@ -42,19 +59,21 @@ class PropietarioController extends Controller
     {
         $validated = $request->validate([
             'nombre_completo' => 'required|string',
-            'dni' => 'required|string|unique:propietarios,dni,' . $id,
-            'email' => 'required|email|unique:propietarios,email,' . $id,
+            'dni' => 'required|string|unique:propietarios,dni,'.$id,
+            'email' => 'required|email|unique:propietarios,email,'.$id,
             'telefono' => 'nullable',
-            'cbu' => 'nullable'
+            'cbu' => 'nullable',
         ]);
 
         $propietario = $this->propietarioService->actualizarPropietario($id, $validated);
+
         return response()->json($propietario);
     }
 
     public function destroy($id)
     {
         $this->propietarioService->eliminarPropietario($id);
+
         return response()->json(['message' => 'Propietario eliminado correctamente']);
     }
 }

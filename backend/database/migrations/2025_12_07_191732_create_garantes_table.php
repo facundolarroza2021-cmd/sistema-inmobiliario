@@ -10,20 +10,20 @@ return new class extends Migration
     {
         Schema::create('garantes', function (Blueprint $table) {
             $table->id();
-            
+
             // Relación con el Contrato (Si borras contrato, chau garantes)
             $table->foreignId('contrato_id')->constrained('contratos')->onDelete('cascade');
-            
+
             $table->string('nombre_completo');
             $table->string('dni');
             $table->string('telefono')->nullable();
-            
+
             // Ejemplo: 'PROPIETARIA', 'RECIBO', 'CAUCION'
-            $table->string('tipo_garantia')->default('RECIBO'); 
-            
+            $table->string('tipo_garantia')->default('RECIBO');
+
             // Ejemplo: "Calle Falsa 123" o "Empresa Coca Cola"
-            $table->text('detalle_garantia')->nullable(); 
-            
+            $table->text('detalle_garantia')->nullable();
+
             $table->timestamps();
         });
     }
