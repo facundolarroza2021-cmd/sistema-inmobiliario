@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Propietario;
+use App\DTOs\PropietarioData; 
 
 class PropietarioService
 {
@@ -11,21 +12,18 @@ class PropietarioService
         return Propietario::all();
     }
 
-    /**
-     * Obtiene el detalle completo y calcula métricas (KPIs).
-     */
     public function obtenerDetalleConMetricas(int $id): array
     {
         $propietario = Propietario::with([
             'propiedades.contratoActivo.inquilino',
-            'liquidaciones',
+            'liquidaciones'
         ])->findOrFail($id);
 
         $totalPropiedades = $propietario->propiedades->count();
         $propiedadesAlquiladas = $propietario->propiedades->whereNotNull('contratoActivo')->count();
-
-        $tasaOcupacion = $totalPropiedades > 0
-            ? round(($propiedadesAlquiladas / $totalPropiedades) * 100, 1)
+        
+        $tasaOcupacion = $totalPropiedades > 0 
+            ? round(($propiedadesAlquiladas / $totalPropiedades) * 100, 1) 
             : 0;
 
         return [
@@ -34,21 +32,24 @@ class PropietarioService
                 'total_propiedades' => $totalPropiedades,
                 'ocupacion' => $propiedadesAlquiladas,
                 'tasa_ocupacion_porcentaje' => $tasaOcupacion,
-                'saldo_pendiente' => 0,
-            ],
+                'saldo_pendiente' => 0
+            ]
         ];
     }
 
-    public function crearPropietario(array $datos): Propietario
+    public function crearPropietario(PropietarioData $datos): Propietario
     {
-        return Propietario::create($datos);
+        return Propietario::create($datos->toArray());
     }
 
-    public function actualizarPropietario(int $id, array $datos): Propietario
+    public function actualizarPropietario(int $id, PropietarioData $datos): Propietario
     {
         $propietario = Propietario::findOrFail($id);
-        $propietario->update($datos);
-
+        
+        $dataArray = array_filter($datos->toArray(), fn($v) => !is_null($v));
+        
+        $propietario->update($dataArray);
+        
         return $propietario;
     }
 

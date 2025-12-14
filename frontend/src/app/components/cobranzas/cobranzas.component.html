@@ -85,27 +85,44 @@
         </ng-container>
   
         <ng-container matColumnDef="estado">
-          <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Estado </th>
-          <td mat-cell *matCellDef="let element" style="text-align: center;"> 
-            <mat-chip 
-                [style.background-color]="element.estado === 'PAGADO' ? '#e8f5e9' : (element.estado === 'PARCIAL' ? '#fff8e1' : '#ffebee')"
-                [style.color]="element.estado === 'PAGADO' ? '#2e7d32' : (element.estado === 'PARCIAL' ? '#f57f17' : '#c62828')">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
+          <td mat-cell *matCellDef="let element">
             
-                <mat-icon style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle; margin-right: 5px;">
-                    {{ element.estado === 'PAGADO' ? 'check_circle' : (element.estado === 'PARCIAL' ? 'pie_chart' : 'pending') }}
-                </mat-icon>
-                
-                {{ element.estado }}
-            </mat-chip>
+            <span *ngIf="element.estado === 'PAGADA'" 
+                  style="color: green; font-weight: bold; background: #e8f5e9; padding: 5px 10px; border-radius: 15px;">
+              PAGADO
+            </span>
+
+            <span *ngIf="element.estado === 'PENDIENTE'" 
+                  style="color: red; font-weight: bold; background: #ffebee; padding: 5px 10px; border-radius: 15px;">
+              PENDIENTE
+            </span>
+
+            <span *ngIf="element.estado === 'PARCIAL'" 
+                  style="color: orange; font-weight: bold; background: #fff3e0; padding: 5px 10px; border-radius: 15px;">
+              PARCIAL
+            </span>
+
           </td>
         </ng-container>
   
         <ng-container matColumnDef="accion">
-          <th mat-header-cell *matHeaderCellDef> </th>
-          <td mat-cell *matCellDef="let element" style="text-align: right; padding-right: 20px;">
-            <button *ngIf="element.estado === 'PAGADO'" mat-icon-button color="primary" (click)="verComprobante(element)">
+          <th mat-header-cell *matHeaderCellDef> Acción </th>
+          <td mat-cell *matCellDef="let element">
+
+            <mat-checkbox *ngIf="element.estado !== 'PAGADA'"
+                          (click)="$event.stopPropagation()"
+                          (change)="$event ? selection.toggle(element) : null"
+                          [checked]="selection.isSelected(element)">
+            </mat-checkbox>
+
+            <button *ngIf="element.estado === 'PAGADA'" 
+                    mat-mini-fab color="primary" 
+                    matTooltip="Ver Recibo PDF"
+                    (click)="verComprobante(element)">
               <mat-icon>picture_as_pdf</mat-icon>
             </button>
+
           </td>
         </ng-container>
   

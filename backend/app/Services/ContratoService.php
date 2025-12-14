@@ -6,6 +6,8 @@ use App\Models\Contrato;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use App\DTOs\ContratoData;
+use App\Enums\ContratoEstado;
 
 class ContratoService
 {
@@ -16,50 +18,53 @@ class ContratoService
         $this->cuotaService = $cuotaService;
     }
 
-    public function crearContratoCompleto(array $datos, ?UploadedFile $archivo = null): Contrato
+    public function crearContratoCompleto(ContratoData $datos, ?UploadedFile $archivo = null): Contrato
     {
         return DB::transaction(function () use ($datos, $archivo) {
 
             $rutaArchivo = $archivo ? $archivo->store('contratos', 'public') : null;
 
-            $inicio = Carbon::parse($datos['fecha_inicio']);
-            $meses = (int) ($datos['meses'] ?? 12);
-            $fin = $inicio->copy()->addMonths($meses);
+            $inicio = Carbon::parse($datos->fecha_inicio);
+            $fin = $inicio->copy()->addMonths($datos->meses);
 
+            // 1. Crear el Contrato usando el Enum
             $contrato = Contrato::create([
-                'inquilino_id' => $datos['inquilino_id'],
-                'propiedad_id' => $datos['propiedad_id'],
-                'monto_alquiler' => $datos['monto_actual'],
+                'inquilino_id' => $datos->inquilino_id,
+                'propiedad_id' => $datos->propiedad_id,
+                'monto_alquiler' => $datos->monto_alquiler,
                 'fecha_inicio' => $inicio->format('Y-m-d'),
                 'fecha_fin' => $fin->format('Y-m-d'),
-                'dia_vencimiento' => (int) $datos['dia_vencimiento'],
-                'activo' => true,
+                'dia_vencimiento' => $datos->dia_vencimiento,
+                'estado' => ContratoEstado::ACTIVO, 
                 'archivo_url' => $rutaArchivo,
             ]);
 
-            if (! empty($datos['garantes'])) {
-                $garantes = is_string($datos['garantes']) ? json_decode($datos['garantes'], true) : $datos['garantes'];
-                foreach ($garantes as $g) {
+            // 2. Crear Garantes (El DTO ya nos dio el array limpio)
+            if (! empty($datos->garantes)) {
+                foreach ($datos->garantes as $g) {
                     $contrato->garantes()->create([
                         'nombre_completo' => $g['nombre_completo'],
                         'dni' => $g['dni'],
                         'telefono' => $g['telefono'] ?? null,
-                        'tipo_garantia' => $g['tipo'],
+                        'tipo_garantia' => $g['tipo'], // Asegúrate que el frontend envíe 'tipo'
                         'detalle_garantia' => $g['detalle'] ?? null,
                     ]);
                 }
             }
 
+            // 3. Generar Cuotas
             $this->cuotaService->generarCuotasParaContrato(
                 $contrato,
-                $meses,
-                (int) $datos['dia_vencimiento']
+                $datos->meses,
+                $datos->dia_vencimiento
             );
+
+            // 4. Actualizar estado de la propiedad (Opcional pero recomendado)
+            $contrato->propiedad->update(['estado' => 'OCUPADO']);
 
             return $contrato;
         });
     }
-
     public function listarContratos()
     {
         return Contrato::with(['inquilino', 'propiedad', 'garantes'])
@@ -70,6 +75,15 @@ class ContratoService
     public function finalizarContrato(int $id): void
     {
         $contrato = Contrato::findOrFail($id);
-        $contrato->update(['activo' => false]);
+        
+        // Usamos el Enum para finalizar
+        $contrato->update([
+            'estado' => ContratoEstado::FINALIZADO,
+            // 'activo' => false // Descomentar si mantienes la columna legacy por seguridad
+        ]);
+
+        // Liberamos la propiedad
+        $contrato->propiedad->update(['estado' => 'DISPONIBLE']);
     }
 }
+

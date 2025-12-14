@@ -1,8 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router'; // Para leer el ID de la URL
+import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { MatDialog } from '@angular/material/dialog';
+// ... tus otros imports (MatButton, MatIcon, etc.)
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -25,36 +26,60 @@ export class PropietarioDetalleComponent implements OnInit {
   kpis: any = { total_propiedades: 0, ocupacion: 0 };
 
   ngOnInit() {
-    // Obtenemos el ID de la URL (ej: /propietarios/5)
     const id = this.route.snapshot.paramMap.get('id');
     
     if(id) {
       this.api.getPropietarioDetalle(+id).subscribe(res => {
-        this.propietario = res.datos;
-        this.kpis = res.kpis;
+        
+        // 1. Detectamos dónde vienen los datos (a veces Laravel usa .data)
+        const d = res.data || res; 
+
+        console.log('Datos Crudos:', d); // Para verificar
+
+        // 2. TRADUCCIÓN MANUAL (Mapeo)
+        // Convertimos lo que manda la API a lo que espera tu HTML
+        this.propietario = {
+          id: d.id,
+          nombre_completo: d.nombre,          // API: nombre -> HTML: nombre_completo
+          dni: d.identificacion,              // API: identificacion -> HTML: dni
+          email: d.contacto?.email,           // Sacamos del objeto contacto
+          telefono: d.contacto?.telefono,     // Sacamos del objeto contacto
+          cbu: d.contacto?.cbu,               // Sacamos del objeto contacto
+          
+          propiedades: d.propiedades || [],   
+          liquidaciones: d.liquidaciones || [] 
+        };
+
+        // 3. Asignamos los KPIs
+        this.kpis = d.kpis || { total_propiedades: 0, ocupacion: 0 };
       });
     }
   }
+
+  // --- CORRECCIÓN CRÍTICA AQUÍ ---
   cargarDatos(id: number) {
-    this.api.getPropietarios().subscribe(res => {
-      this.propietario = res;
+    // Antes llamabas a getPropietarios() (TODOS), ahora llamamos al detalle (UNO)
+    this.api.getPropietarioDetalle(id).subscribe(res => {
+      const respuestaReal = res.data || res;
+      this.propietario = respuestaReal.datos;
+      this.kpis = respuestaReal.kpis;
     });
   }
 
   getColorAvatar(id: number): string {
+    if (!id) return '#ccc'; // Protección por si id es undefined
     const colores = ['#e57373', '#ba68c8', '#64b5f6', '#4db6ac', '#ffb74d'];
     return colores[id % colores.length];
   }
+
   editarPerfil() {
-    // Abrimos el dialog pasándole EL PROPIETARIO ACTUAL
     const dialogRef = this.dialog.open(PropietarioDialogComponent, {
       width: '500px',
-      data: this.propietario // <--- Aquí pasamos la data
+      data: this.propietario
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Si guardó cambios, recargamos la página para verlos
         this.cargarDatos(this.propietario.id);
       }
     });

@@ -72,7 +72,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'message' => 'Login exitoso',
-                ...$data, // Expande access_token, user, etc.
+                ...$data, 
             ]);
 
         } catch (ValidationException $e) {

@@ -5,11 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Enums\ContratoEstado;
 
 class Contrato extends Model
 {
     protected $guarded = [];
 
+    protected $casts = [
+        'fecha_inicio' => 'date',
+        'fecha_fin' => 'date',
+        'estado' => ContratoEstado::class, 
+    ];
     public function inquilino(): BelongsTo
     {
         return $this->belongsTo(Inquilino::class);

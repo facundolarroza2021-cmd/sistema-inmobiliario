@@ -11,4 +11,13 @@ class Inquilino extends Model
     use HasFactory, SoftDeletes;
 
     protected $guarded = [];
+
+    protected $fillable = [
+        'nombre_completo',
+        'dni',
+        'email',
+        'telefono',
+        'garante_nombre',
+        'garante_dni',    
+    ];
 }

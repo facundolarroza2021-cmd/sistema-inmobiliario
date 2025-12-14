@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\PropiedadService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PropiedadController extends Controller
 {
@@ -204,8 +206,12 @@ class PropiedadController extends Controller
      */
     public function destroy($id)
     {
+        $propiedad = \App\Models\Propiedad::findOrFail($id);
+
+        Gate::authorize('delete', $propiedad);
+
         $this->propiedadService->eliminarPropiedad($id);
 
-        return response()->json(['message' => 'Propiedad eliminada']);
+        return response()->json(['message' => 'Propiedad eliminada correctamente']);
     }
 }

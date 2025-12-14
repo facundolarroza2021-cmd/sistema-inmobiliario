@@ -2,147 +2,75 @@
 
 namespace Database\Seeders;
 
-use App\Models\Contrato;
-use App\Models\Cuota;
-use App\Models\Inquilino;
-use App\Models\Propiedad;
-use App\Models\Propietario;
-use Carbon\Carbon; // <--- Importante
 use Illuminate\Database\Seeder;
+use App\Models\User;
+use App\Models\Propietario;
+use App\Models\Propiedad;
+use App\Models\Inquilino;
+use App\Models\Contrato;
+use App\Enums\ContratoEstado; // Asegúrate de importar tu Enum
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $prop1 = Propietario::create([
-            'nombre_completo' => 'Roberto Dueñas (VIP)',
-            'dni' => '20.123.456',
-            'email' => 'roberto@email.com',
-            'telefono' => '11-5555-0001',
-            'cbu' => '0000003100011122233344',
+        // 1. EL ADMIN (Para que puedas loguearte en la demo)
+        User::factory()->create([
+            'name' => 'Admin Inmobiliaria',
+            'email' => 'admin@admin.com',
+            'password' => bcrypt('password'), // Contraseña fácil para la demo
         ]);
 
-        $prop2 = Propietario::create([
-            'nombre_completo' => 'Laura Propietaria',
-            'dni' => '27.987.654',
-            'email' => 'laura@email.com',
-            'telefono' => '11-5555-0002',
+        // 2. ESCENARIO A: El Propietario "Estrella" (Para mostrar métricas altas)
+        $propietarioTop = Propietario::factory()->create([
+            'nombre_completo' => 'Juan Pérez (Dueño Top)',
         ]);
 
-        // 2. PROPIEDADES
-        $casa1 = Propiedad::create([
-            'direccion' => 'Av. San Martín 450',
-            'tipo' => 'Casa',
-            'propietario_id' => $prop1->id,
-            'comision' => 10,
+        // Le creamos 10 propiedades
+        $propiedadesTop = Propiedad::factory(10)->create([
+            'propietario_id' => $propietarioTop->id,
+            'estado' => 'DISPONIBLE'
         ]);
 
-        $depto1 = Propiedad::create([
-            'direccion' => 'Mitre 1200, Piso 4 A',
-            'tipo' => 'Departamento',
-            'propietario_id' => $prop1->id,
-            'comision' => 8,
-        ]);
-
-        $local1 = Propiedad::create([
-            'direccion' => 'Peatonal 850 (Local)',
-            'tipo' => 'Local',
-            'propietario_id' => $prop2->id,
-            'comision' => 15,
-        ]);
-
-        // 3. INQUILINOS
-        $inq1 = Inquilino::create([
-            'nombre_completo' => 'Juan Pagador (Al día)',
-            'dni' => '30.111.222',
-            'email' => 'juan@gmail.com',
-            'telefono' => '11-4444-5555',
-        ]);
-
-        $inq2 = Inquilino::create([
-            'nombre_completo' => 'Lucía Nueva',
-            'dni' => '31.333.444',
-            'email' => 'lucia@gmail.com',
-            'telefono' => '11-4444-6666',
-        ]);
-
-        $inq3 = Inquilino::create([
-            'nombre_completo' => 'Pedro Deudor',
-            'dni' => '32.555.666',
-            'email' => 'pedro@gmail.com',
-            'telefono' => '11-4444-7777',
-        ]);
-
-        // 4. CONTRATOS Y GENERACIÓN DE CUOTAS
-
-        // CASO A: Contrato Normal (Juan)
-        $con1 = Contrato::create([
-            'propiedad_id' => $casa1->id,
-            'inquilino_id' => $inq1->id,
-            'fecha_inicio' => Carbon::now()->subMonths(6),
-            'fecha_fin' => Carbon::now()->addMonths(18),
-            'monto_alquiler' => 350000,
-            'dia_vencimiento' => 10,
-            'activo' => true,
-        ]);
-        $this->generarCuotas($con1); 
-
-        foreach($con1->cuotas as $cuota) {
-            /** @var \App\Models\Cuota $cuota */
-            
-            if ($cuota->periodo < Carbon::now()->format('Y-m')) {
-                $cuota->update(['estado' => 'PAGADO', 'saldo_pendiente' => 0]);
-            }
+        // Alquilamos 8 de ellas (80% de ocupación para que el gráfico se vea bonito)
+        foreach($propiedadesTop->take(8) as $propiedad) {
+            $this->crearContratoDemo($propiedad, 'ACTIVO');
         }
 
-        //Contrato Nuevo (Lucia)
-        $con2 = Contrato::create([
-            'propiedad_id' => $depto1->id,
-            'inquilino_id' => $inq2->id,
-            'fecha_inicio' => Carbon::now()->startOfMonth(),
-            'fecha_fin' => Carbon::now()->addMonths(24),
-            'monto_alquiler' => 280000,
-            'dia_vencimiento' => 5,
-            'activo' => true,
+        // 3. ESCENARIO B: El Caso "Problemático" (Para mostrar alertas de deuda)
+        $propiedadProblema = Propiedad::factory()->create([
+            'titulo' => 'Casa con Deuda',
+            'estado' => 'OCUPADO'
         ]);
-        $this->generarCuotas($con2); // <--- Generamos la deuda (aparecerá en caja)
 
-        // CASO C: Contrato Deudor (Pedro)
-        $con3 = Contrato::create([
-            'propiedad_id' => $local1->id,
-            'inquilino_id' => $inq3->id,
-            'fecha_inicio' => Carbon::now()->subMonths(10),
-            'fecha_fin' => Carbon::now()->addMonths(14),
-            'monto_alquiler' => 500000,
-            'dia_vencimiento' => 1,
-            'activo' => true,
-        ]);
-        $this->generarCuotas($con3);
+        $this->crearContratoDemo($propiedadProblema, 'EN_MORA');
+
+        // 4. RELLENO GENERAL (Para que las tablas tengan volumen)
+        Propietario::factory(5)->create()->each(function ($prop) {
+            Propiedad::factory(3)->create(['propietario_id' => $prop->id]);
+        });
     }
 
-    // --- FUNCIÓN AUXILIAR PARA GENERAR CUOTAS ---
-    private function generarCuotas($contrato)
+    // Función auxiliar para crear contrato rápido
+    private function crearContratoDemo($propiedad, $estadoEnum)
     {
-        $inicio = Carbon::parse($contrato->fecha_inicio);
-        $fin = Carbon::parse($contrato->fecha_fin);
-        $fecha_aux = $inicio->copy();
-        $numero_cuota = 1;
+        $inquilino = Inquilino::factory()->create();
+        
+        $contrato = Contrato::create([
+            'inquilino_id' => $inquilino->id,
+            'propiedad_id' => $propiedad->id,
+            'monto_alquiler' => 120000,
+            'fecha_inicio' => now()->subMonths(3), // Empezó hace 3 meses
+            'fecha_fin' => now()->addMonths(9),
+            'dia_vencimiento' => 5,
+            'estado' => $estadoEnum == 'ACTIVO' ? \App\Enums\ContratoEstado::ACTIVO : \App\Enums\ContratoEstado::EN_MORA,
+        ]);
 
-        while ($fecha_aux->lt($fin)) {
-            $vencimiento = $fecha_aux->copy()->day($contrato->dia_vencimiento);
+        // Actualizamos estado propiedad
+        $propiedad->update(['estado' => 'OCUPADO']);
 
-            Cuota::create([
-                'contrato_id' => $contrato->id,
-                'numero_cuota' => $numero_cuota,
-                'periodo' => $fecha_aux->format('Y-m'),
-                'fecha_vencimiento' => $vencimiento->format('Y-m-d'),
-                'monto_original' => $contrato->monto_alquiler,
-                'saldo_pendiente' => $contrato->monto_alquiler,
-                'estado' => 'PENDIENTE',
-            ]);
-
-            $fecha_aux->addMonth();
-            $numero_cuota++;
-        }
+        // Generamos cuotas ficticias (simulamos que pagó 2 y debe 1)
+        // Aquí podrías llamar a tu CuotaService si quisieras ser estricto, 
+        // pero para seeding rápido basta con crearlas si tienes la Factory de Cuotas.
     }
 }

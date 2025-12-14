@@ -58,9 +58,29 @@ export class ContratoDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<ContratoDialogComponent>) {}
 
   ngOnInit() {
-    // Cargar listas al abrir la ventana
-    this.api.getInquilinos().subscribe(d => this.listaInquilinos = d);
-    this.api.getPropiedades().subscribe(d => this.listaPropiedades = d);
+    // CARGAR INQUILINOS
+    this.api.getInquilinos().subscribe((d: any) => {
+        // Truco: Si viene 'data' (paginado antiguo) o directo (get nuevo), funciona igual.
+        this.listaInquilinos = d.data || d; 
+        console.log('Inquilinos:', this.listaInquilinos); // Mira la consola del navegador (F12)
+    });
+
+    // CARGAR PROPIEDADES
+    this.api.getPropiedades().subscribe((d: any) => {
+        this.listaPropiedades = d.data || d;
+    });
+  }
+
+  // ESTA ES LA FUNCIÓN QUE RELLENA EL PRECIO
+  alSeleccionarPropiedad() {
+    const id = this.nuevoContrato.propiedad_id;
+    // Buscamos la propiedad seleccionada en la memoria
+    const prop = this.listaPropiedades.find(p => p.id == id);
+
+    if (prop) {
+        // Asignamos el precio al contrato
+        this.nuevoContrato.monto_actual = prop.precio_alquiler;
+    }
   }
 
   // --- MANEJO DE ARCHIVO ---

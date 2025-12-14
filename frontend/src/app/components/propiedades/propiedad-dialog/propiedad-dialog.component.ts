@@ -32,14 +32,17 @@ export class PropiedadDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<PropiedadDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any // <--- Recibimos datos para editar
+    @Inject(MAT_DIALOG_DATA) public data: any 
   ) {}
 
   ngOnInit() {
-    this.api.getPropietarios().subscribe(res => this.listaPropietarios = res);
+    this.api.getPropietarios().subscribe((res: any) => {
+        console.log('Propietarios cargados:', res); 
+        this.listaPropietarios = res.data || res; 
+    });
 
     if (this.data) {
-      // MODO EDICIÓN
+      // MODO EDICIÓN (Esto está bien, lo dejamos igual)
       this.nuevaPropiedad = { 
         direccion: this.data.direccion,
         tipo: this.data.tipo,

@@ -58,6 +58,11 @@ class AuthService
      */
     public function logout(User $user): void
     {
-        $user->currentAccessToken()->delete();
+        $accessToken = $user->currentAccessToken();
+
+        if ($accessToken) {
+            /** @var \Laravel\Sanctum\PersonalAccessToken $accessToken */
+            $accessToken->delete();
+        }
     }
 }

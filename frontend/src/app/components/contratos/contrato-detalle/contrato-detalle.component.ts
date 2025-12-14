@@ -19,7 +19,8 @@ export class ContratoDetalleComponent {
   constructor(
     public dialogRef: MatDialogRef<ContratoDetalleComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+    
+  ) {console.log('Datos del contrato recibidos:', this.data);}
 
   finalizarContrato() {
     if(confirm('¿Seguro que deseas finalizar este contrato? Pasará a estado INACTIVO.')) {

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\InquilinoService;
 use Illuminate\Http\Request;
+use App\Http\Resources\InquilinoResource;
+use App\DTOs\InquilinoData;
 
 class InquilinoController extends Controller
 {
@@ -26,7 +28,9 @@ class InquilinoController extends Controller
      */
     public function index()
     {
-        return response()->json($this->inquilinoService->listarTodos());
+        return response()->json(
+            \App\Models\Inquilino::latest()->get()
+        );
     }
 
     /**
@@ -107,8 +111,9 @@ class InquilinoController extends Controller
             'telefono' => 'required|string',
             'email' => 'nullable|email',
         ]);
+        $dto = InquilinoData::fromArray($validated);        
 
-        $inquilino = $this->inquilinoService->actualizarInquilino($id, $validated);
+        $inquilino = $this->inquilinoService->actualizarInquilino($id, $dto);
 
         return response()->json($inquilino);
     }

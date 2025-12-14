@@ -29,11 +29,11 @@
           <td mat-cell *matCellDef="let element"> 
             <div class="user-profile" style="cursor: pointer;" [routerLink]="['/propietarios', element.id]">
                   <div class="avatar" [style.background-color]="getColorAvatar(element.id)">
-                      {{ element.nombre_completo.charAt(0) }}
+                      {{ element.nombre.charAt(0) }}
                   </div>
                   <div class="user-info">
-                      <span class="user-name">{{ element.nombre_completo }}</span>
-                      <span class="user-email">{{ element.email || 'Sin email registrado' }}</span>
+                      <span class="user-name">{{ element.nombre }}</span>
+                      <span class="user-email">{{ element.contacto.email || 'Sin email registrado' }}</span>
                   </div>
               </div>
           </td>
@@ -42,7 +42,7 @@
         <ng-container matColumnDef="dni">
           <th mat-header-cell *matHeaderCellDef> Identificación </th>
           <td mat-cell *matCellDef="let element" style="font-family: monospace; font-size: 13px; color: #555;"> 
-              {{element.dni}} 
+              {{element.identificacion}} 
           </td>
         </ng-container>
   
@@ -52,7 +52,7 @@
               <div style="display: flex; align-items: center; gap: 8px;">
                   <span style="font-weight: 500; color: #444;">{{element.telefono}}</span>
                   <a *ngIf="element.telefono" 
-                     href="https://wa.me/549{{element.telefono}}?text=Hola {{element.nombre_completo}}, te contacto desde la inmobiliaria." 
+                     href="https://wa.me/549{{element.telefono}}?text=Hola {{element.nombre}}, te contacto desde la inmobiliaria." 
                      target="_blank" 
                      class="btn-whatsapp">
                      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="18">
@@ -64,7 +64,7 @@
           <th mat-header-cell *matHeaderCellDef> Identificación </th>
           <td mat-cell *matCellDef="let element">
               <div style="display: flex; flex-direction: column;">
-                  <span style="font-weight: 500;">{{ element.dni }}</span>
+                  <span style="font-weight: 500;">{{ element.identificacion }}</span>
                   <span *ngIf="element.cbu" style="font-size: 11px; color: #666;">
                       CBU: {{ element.cbu }}
                   </span>

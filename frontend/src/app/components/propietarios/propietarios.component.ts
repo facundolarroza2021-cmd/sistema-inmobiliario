@@ -23,19 +23,21 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator'; 
 export class PropietariosComponent implements OnInit {
   
   private api = inject(ApiService);
-  private dialog = inject(MatDialog); // <--- Inyectar Dialog
-  private mensaje = inject(MensajeService); // <--- Inyectar Mensajes
+  private dialog = inject(MatDialog);
+  private mensaje = inject(MensajeService); 
 
   dataSource = new MatTableDataSource<any>([]);
-  columnasMostradas: string[] = ['id', 'propietario', 'identificacion', 'contacto', 'acciones']; // <--- Asegurate que 'acciones' esté aquí
+  columnasMostradas: string[] = ['id', 'propietario', 'identificacion', 'contacto', 'acciones']; 
 
   ngOnInit(): void {
     this.cargarDatos();
   }
 
   cargarDatos() {
-    this.api.getPropietarios().subscribe(res => {
-      this.dataSource.data = res;
+    this.api.getPropietarios().subscribe((res: any) => {
+      this.dataSource.data = res.data || res; 
+      
+      console.log('Propietarios cargados:', this.dataSource.data); 
     });
   }
 
@@ -43,17 +45,16 @@ export class PropietariosComponent implements OnInit {
   editar(propietario: any) {
     this.dialog.open(PropietarioDialogComponent, {
       width: '500px',
-      data: propietario // <--- Pasamos el propietario al formulario
+      data: propietario 
     }).afterClosed().subscribe(result => {
       if (result) {
-        this.cargarDatos(); // Recargamos la tabla si hubo cambios
+        this.cargarDatos(); 
       }
     });
   }
 
-  // --- FUNCIÓN ELIMINAR ---
   eliminar(propietario: any) {
-    if(confirm(`¿Estás seguro de eliminar a ${propietario.nombre_completo}?`)) {
+    if(confirm(`¿Estás seguro de eliminar a ${propietario.nombre}?`)) { 
       this.api.eliminarPropietario(propietario.id).subscribe({
         next: () => {
           this.mensaje.exito('Propietario eliminado');
@@ -68,10 +69,10 @@ export class PropietariosComponent implements OnInit {
   abrirDialogo() {
     this.dialog.open(PropietarioDialogComponent, {
       width: '500px',
-      data: null // <--- IMPORTANTE: data es null para indicar "Modo Creación"
+      data: null 
     }).afterClosed().subscribe(result => {
       if (result) {
-        this.cargarDatos(); // Recargar la tabla si se creó uno nuevo
+        this.cargarDatos(); 
       }
     });
   }
@@ -81,9 +82,8 @@ export class PropietariosComponent implements OnInit {
   }
 
   getColorAvatar(nombre: string): string {
-    if (!nombre) return '#333333'; // Color gris oscuro por defecto si no hay nombre
+    if (!nombre) return '#333333'; 
 
-    // Lista de colores bonitos (Material Design)
     const colores = [
       '#d32f2f', '#c2185b', '#7b1fa2', '#512da8', '#303f9f',
       '#1976d2', '#0288d1', '#0097a7', '#00796b', '#388e3c',

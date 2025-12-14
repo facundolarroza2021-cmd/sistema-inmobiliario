@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\CajaService;
-use Illuminate\Http\Request; // Inyectamos el servicio
+use Illuminate\Http\Request; 
 
 class CajaController extends Controller
 {

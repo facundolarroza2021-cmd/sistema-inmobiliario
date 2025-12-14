@@ -24,3 +24,6 @@ frontend/.angular/cache/
 .vscode/
 .idea/
 .DS_Store
+
+node_modules/
+**/node_modules/

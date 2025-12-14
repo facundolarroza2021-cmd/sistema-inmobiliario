@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Inquilino;
+use App\DTOs\InquilinoData;
 
 class InquilinoService
 {
@@ -16,11 +17,15 @@ class InquilinoService
         return Inquilino::create($datos);
     }
 
-    public function actualizarInquilino(int $id, array $datos): Inquilino
+    public function actualizarInquilino(int $id, InquilinoData $datos): Inquilino
     {
         $inquilino = Inquilino::findOrFail($id);
-        $inquilino->update($datos);
-
+        
+        // Filtramos nulos para actualizaciones parciales
+        $dataArray = array_filter($datos->toArray(), fn($v) => !is_null($v));
+        
+        $inquilino->update($dataArray);
+        
         return $inquilino;
     }
 

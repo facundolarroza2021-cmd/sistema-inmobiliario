@@ -16,6 +16,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { CobroDialogComponent } from './cobro-dialog/cobro-dialog.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cobranzas',
@@ -113,30 +114,59 @@ export class CobranzasComponent implements OnInit {
     this.cargando = true;
     
     const payload = {
-      cuota_ids: cuotas.map(p => p.id),
-      forma_pago: datosExtra.forma_pago,
+      cuotas_ids: cuotas.map(p => p.id),
+      medio_pago: datosExtra.forma_pago,
       observacion: datosExtra.observacion,
-      monto_recibido: datosExtra.monto_final // <--- ENVIAMOS EL MONTO EDITADO
+      monto: datosExtra.monto_final // <--- ENVIAMOS EL MONTO EDITADO
     };
 
-    this.api.registrarPagoMultiple(payload).subscribe((res: any) => {
-      // ... lo mismo de antes ...
-      this.mensaje.exito('Pago registrado exitosamente');
-      this.selection.clear();
-      this.cargarDeudas();
-      if(res.url_pdf) window.open(res.url_pdf, '_blank');
-    }, (err) => {
-      this.cargando = false;
-      this.mensaje.error(err.error.error || err.message); // Mejor manejo de error
+    this.api.registrarPagoMultiple(payload).subscribe({
+      next: (res: any) => {
+        this.cargando = false;
+        this.selection.clear();
+        this.cargarDeudas(); // Recargamos la tabla para que salga el botón nuevo
+
+        // ALERTA CON BOTÓN DE DESCARGA
+        if (res.url_pdf) {
+          Swal.fire({
+            title: '¡Cobro Exitoso! 💰',
+            text: 'El pago se registró correctamente.',
+            icon: 'success',
+            showCancelButton: true,
+            confirmButtonText: 'Ver Recibo PDF',
+            cancelButtonText: 'Cerrar'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.open(res.url_pdf, '_blank');
+            }
+          });
+        } else {
+          this.mensaje.exito('Pago registrado exitosamente');
+        }
+      },
+      error: (err) => {
+        // ... (tu manejo de errores) ...
+      }
     });
   }
 
-  // Mantenemos la función de ver comprobante individual
   verComprobante(cuota: any) {
+    // Verificamos si la cuota tiene pagos asociados
     if (cuota.pagos && cuota.pagos.length > 0) {
+      // Tomamos el último pago realizado
       const ultimoPago = cuota.pagos[cuota.pagos.length - 1];
-      const url = `http://localhost:8000/storage/${ultimoPago.ruta_pdf}`;
-      window.open(url, '_blank');
+
+      if (ultimoPago.ruta_pdf) {
+        // Construimos la URL completa
+        // Asegúrate que esta URL coincida con tu backend (puerto 8000)
+        const url = `http://localhost:8000/storage/${ultimoPago.ruta_pdf}`;
+        window.open(url, '_blank');
+      } else {
+        this.mensaje.error('Esta cuota no tiene un PDF generado.');
+      }
+    } else {
+      // Caso raro: Está pagada pero no tiene registro en la tabla pagos
+      this.mensaje.error('No se encontró el registro del pago.');
     }
   }
 }

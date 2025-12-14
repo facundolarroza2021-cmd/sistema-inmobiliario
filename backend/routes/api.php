@@ -33,11 +33,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/perfil', [AuthController::class, 'perfil']);
         Route::post('/register', [AuthController::class, 'register']);
-        Route::delete('/propiedades/{id}', [PropiedadController::class, 'destroy']);
-        Route::delete('/inquilinos/{id}', [InquilinoController::class, 'destroy']);
-        Route::delete('/propietarios/{id}', [PropietarioController::class, 'destroy']);
-        Route::delete('/gastos/{id}', [GastoController::class, 'destroy']);
-        Route::delete('/caja/{id}', [CajaController::class, 'destroy']);
     });
 
     // --- GRUPO 2: ADMINISTRATIVOS (Incluye Admin) ---
@@ -70,7 +65,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/tickets', [TicketController::class, 'index']);
         Route::post('/tickets', [TicketController::class, 'store']);
         Route::put('/tickets/{id}', [TicketController::class, 'update']);
+        
         Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
+        Route::delete('/propiedades/{id}', [PropiedadController::class, 'destroy']);
+        Route::delete('/inquilinos/{id}', [InquilinoController::class, 'destroy']);
+        Route::delete('/propietarios/{id}', [PropietarioController::class, 'destroy']);
+        Route::delete('/gastos/{id}', [GastoController::class, 'destroy']);
+        Route::delete('/caja/{id}', [CajaController::class, 'destroy']);
     });
 
     //  COBRADORES ---

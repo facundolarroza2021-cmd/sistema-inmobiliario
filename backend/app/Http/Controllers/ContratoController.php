@@ -21,8 +21,7 @@ class ContratoController extends Controller
 
     public function store(Request $request)
     {
-        // Validamos aquí (HTTP Layer)
-        $request->validate([
+        $validated = $request->validate([
             'inquilino_id' => 'required|exists:inquilinos,id',
             'propiedad_id' => 'required|exists:propiedades,id',
             'monto_actual' => 'required|numeric',
@@ -34,8 +33,10 @@ class ContratoController extends Controller
         ]);
 
         try {
+            $dto = \App\DTOs\ContratoData::fromArray($validated);
+
             $contrato = $this->contratoService->crearContratoCompleto(
-                $request->all(),
+                $dto, 
                 $request->file('archivo')
             );
 
@@ -45,7 +46,7 @@ class ContratoController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error al crear contrato: '.$e->getMessage()], 500);
+            return response()->json(['message' => 'Error: '.$e->getMessage()], 500);
         }
     }
 

@@ -11,7 +11,7 @@
         <mat-label>Propietario</mat-label>
         <mat-select [(ngModel)]="nuevaPropiedad.propietario_id">
           <mat-option *ngFor="let p of listaPropietarios" [value]="p.id">
-            {{ p.nombre_completo }} (DNI: {{p.dni}})
+            {{ p.nombre }} (DNI: {{p.identificacion}})
           </mat-option>
         </mat-select>
         <mat-icon matSuffix>person</mat-icon>

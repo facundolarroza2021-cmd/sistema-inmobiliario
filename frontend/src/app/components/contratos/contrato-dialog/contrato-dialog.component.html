@@ -18,12 +18,18 @@
   
       <mat-form-field appearance="outline">
         <mat-label>Propiedad</mat-label>
-        <mat-select [(ngModel)]="nuevoContrato.propiedad_id">
-          <mat-option *ngFor="let p of listaPropiedades" [value]="p.id">
-            {{ p.direccion }} ({{ p.tipo }})
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+        
+        <mat-select 
+            [(ngModel)]="nuevoContrato.propiedad_id" 
+            name="propiedad_id"
+            (selectionChange)="alSeleccionarPropiedad()">
+        
+            <mat-option *ngFor="let p of listaPropiedades" [value]="p.id">
+                {{ p.direccion }} - {{ p.tipo }} ({{ p.estado }})
+            </mat-option>
+        
+        </mat-select> 
+        </mat-form-field>
   
       <mat-form-field appearance="outline">
         <mat-label>Monto ($)</mat-label>
