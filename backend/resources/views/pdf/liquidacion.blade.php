@@ -3,64 +3,80 @@
 <head>
     <title>Liquidación a Propietario</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .header { text-align: center; border-bottom: 2px solid #333; margin-bottom: 20px; }
-        .titulo { font-size: 22px; font-weight: bold; }
-        .subtitulo { color: #555; }
-        .tabla { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .tabla th, .tabla td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        .tabla th { background-color: #f2f2f2; }
-        .totales { margin-top: 30px; float: right; width: 300px; }
-        .fila-total { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px; }
-        .final { font-size: 18px; border-top: 2px solid #333; padding-top: 10px; }
+        body { font-family: sans-serif; padding: 20px; color: #333; }
+        .header { text-align: center; border-bottom: 2px solid #444; margin-bottom: 20px; padding-bottom: 10px; }
+        .info-box { width: 100%; margin-bottom: 20px; }
+        .info-box td { padding: 5px; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .table th { background-color: #f2f2f2; }
+        .totales { margin-top: 20px; text-align: right; width: 100%; }
+        .totales td { padding: 5px; font-size: 14px; }
+        .neto { font-size: 18px; font-weight: bold; color: #2c3e50; border-top: 2px solid #333; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="titulo">LIQUIDACIÓN DE ALQUILERES</div>
-        <div class="subtitulo">Periodo: {{ $liquidacion->periodo }}</div>
-        <p>Propietario: {{ $propietario->nombre_completo }} (CBU: {{ $propietario->cbu }})</p>
+        <h2>LIQUIDACIÓN DE ALQUILERES</h2>
+        <p>Comprobante #{{ $liquidacion->id }} - Fecha: {{ $fecha->format('d/m/Y') }}</p>
     </div>
 
-    <h3>Detalle de Cobros</h3>
-    <table class="tabla">
+    <table class="info-box">
+        <tr>
+            <td><strong>Propietario:</strong> {{ $propietario->nombre }} {{ $propietario->apellido }}</td>
+            <td><strong>Periodo:</strong> {{ $liquidacion->periodo }}</td>
+        </tr>
+        <tr>
+            <td><strong>DNI/CUIT:</strong> {{ $propietario->dni ?? '-' }}</td>
+            <td><strong>Email:</strong> {{ $propietario->email }}</td>
+        </tr>
+    </table>
+
+    <h3>Detalle de Conceptos Cobrados</h3>
+    <table class="table">
         <thead>
             <tr>
                 <th>Propiedad</th>
                 <th>Inquilino</th>
-                <th>Monto Cobrado</th>
-                <th>Comisión (%)</th>
-                <th>Descuento</th>
+                <th>Concepto</th>
+                <th>Importe</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($cuotasCobradas as $item)
+            @foreach($detalles as $item)
             <tr>
-                <td>{{ $item->contrato->propiedad->direccion }}</td>
-                <td>{{ $item->contrato->inquilino->nombre_completo }}</td>
-                <td>${{ number_format($item->monto_total, 2) }}</td>
-                <td>{{ $item->contrato->propiedad->comision }}%</td>
-                <td>
-                    ${{ number_format($item->monto_total * ($item->contrato->propiedad->comision/100), 2) }}
-                </td>
+                <td>{{ $item->contrato->propiedad->direccion ?? 'Propiedad' }}</td>
+                <td>{{ $item->contrato->inquilino->nombre_completo ?? 'Inquilino' }}</td>
+                <td>Cuota #{{ $item->numero_cuota }}</td>
+                <td>${{ number_format($item->importe, 2) }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
 
-    <div class="totales">
-        <div class="fila-total">
-            <span>Total Recaudado:</span>
-            <span>$ {{ number_format($liquidacion->monto_total_cobrado, 2) }}</span>
-        </div>
-        <div class="fila-total" style="color: red;">
-            <span>Menos Honorarios:</span>
-            <span>- $ {{ number_format($liquidacion->comision_cobrada, 2) }}</span>
-        </div>
-        <div class="fila-total final">
-            <span>A TRANSFERIR:</span>
-            <span>$ {{ number_format($liquidacion->monto_entregado, 2) }}</span>
-        </div>
+    <table class="totales" align="right">
+        <tr>
+            <td>Total Recaudado:</td>
+            <td><strong>${{ number_format($liquidacion->total_ingresos, 2) }}</strong></td>
+        </tr>
+        <tr>
+            <td>(-) Comisión Inmobiliaria:</td>
+            <td style="color: #c0392b;">- ${{ number_format($liquidacion->comision_inmobiliaria, 2) }}</td>
+        </tr>
+        @if($liquidacion->total_gastos > 0)
+        <tr>
+            <td>(-) Gastos / Reparaciones:</td>
+            <td style="color: #c0392b;">- ${{ number_format($liquidacion->total_gastos, 2) }}</td>
+        </tr>
+        @endif
+        <tr>
+            <td class="neto">TOTAL A PAGAR:</td>
+            <td class="neto">${{ number_format($liquidacion->monto_neto, 2) }}</td>
+        </tr>
+    </table>
+
+    <div style="margin-top: 60px; text-align: center; font-size: 10px; color: #777;">
+        <p>Documento generado electrónicamente por Sistema de Gestión Inmobiliaria</p>
     </div>
 </body>
 </html>

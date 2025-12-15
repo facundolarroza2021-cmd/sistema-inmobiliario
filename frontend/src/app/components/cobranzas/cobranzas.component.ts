@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { MensajeService } from '../../services/mensaje.service';
 import { SelectionModel } from '@angular/cdk/collections'; 
+import { FormsModule } from '@angular/forms'; // Añadido: Necesario para el input de filtro
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -14,159 +15,171 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCheckboxModule } from '@angular/material/checkbox'; 
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip'; // Añadido
 import { MatDialog } from '@angular/material/dialog';
 import { CobroDialogComponent } from './cobro-dialog/cobro-dialog.component';
 import Swal from 'sweetalert2';
+import { EventosService } from '../../services/eventos.service';
 
 @Component({
   selector: 'app-cobranzas',
   standalone: true,
   imports: [
-    CommonModule, MatCardModule, MatButtonModule, MatTableModule, 
+    CommonModule, FormsModule, MatCardModule, MatButtonModule, MatTableModule, 
     MatIconModule, MatInputModule, MatFormFieldModule, MatPaginatorModule, 
-    MatSortModule, MatChipsModule, MatProgressSpinnerModule, MatCheckboxModule
+    MatSortModule, MatChipsModule, MatProgressSpinnerModule, MatCheckboxModule,
+    MatTooltipModule // Agregado para usar matTooltip
   ],
   templateUrl: './cobranzas.component.html',
-  styleUrl: './cobranzas.component.css'
+  styleUrls: ['./cobranzas.component.css']
 })
 export class CobranzasComponent implements OnInit {
   private api = inject(ApiService);
   private mensaje = inject(MensajeService);
-  private dialog = inject(MatDialog);
+  private dialog = inject(MatDialog); // Inyección del Dialog
+  
 
-  columnas: string[] = ['select', 'periodo', 'inquilino', 'propiedad', 'monto', 'estado', 'accion'];
-  dataSource = new MatTableDataSource<any>([]);
-  selection = new SelectionModel<any>(true, []); // true = múltiple
-  cargando = true;
+  private eventosService = inject(EventosService);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
+  // Variables
+  dataSource = new MatTableDataSource<any>([]);
+  columnas: string[] = ['select', 'periodo', 'inquilino', 'propiedad', 'monto', 'estado', 'accion'];
+  selection = new SelectionModel<any>(true, []); 
+  cargando: boolean = false;
+
   ngOnInit() {
-    this.cargarDeudas();
+    this.cargarDeudas(); // Carga inicial
+    this.suscribirAEventos(); // <-- Añadir suscripción
   }
 
-  cargarDeudas() {
-    this.cargando = true;
-    this.api.getCuotasPendientes().subscribe(data => {
-      this.dataSource.data = data;
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-      this.cargando = false;
-      
-      // Filtro
-      this.dataSource.filterPredicate = (data: any, filter: string) => {
-        const info = `${data.periodo} ${data.contrato.inquilino.nombre_completo}`.toLowerCase();
-        return info.includes(filter);
-      };
+  suscribirAEventos() {
+    this.eventosService.cuotasActualizadas$.subscribe(() => {
+      this.mensaje.exito('El listado de deudas se ha actualizado automáticamente.');
+      this.cargarDeudas(); // Llama a la función que refresca la lista de cuotas desde la API
     });
   }
 
-  aplicarFiltro(event: Event) {
-    const valor = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = valor.trim().toLowerCase();
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
-  // --- LÓGICA DE CHECKBOX ---
+  /**
+   * Carga todas las cuotas pendientes desde el backend y las procesa.
+   * Es la función principal de recarga de datos.
+   */
+  cargarDeudas() {
+    this.cargando = true;
+    this.selection.clear();
+
+    this.api.getDeudas().subscribe({
+        next: (res: any) => {
+            
+            const datosBrutos = res.data || res; 
+
+            if (!datosBrutos || !Array.isArray(datosBrutos)) {
+                this.dataSource.data = [];
+                this.cargando = false;
+                return;
+            }
+
+            const deudasProcesadas = datosBrutos.map((item: any) => ({
+                ...item,
+                saldo_pendiente: parseFloat(item.saldo_pendiente) || 0 
+            }));
+            
+            this.dataSource.data = deudasProcesadas;
+            this.cargando = false;
+        
+            if (this.paginator) {
+                this.dataSource.paginator = this.paginator;
+            }
+            if (this.sort) {
+                this.dataSource.sort = this.sort;
+            }
+        },
+        error: (err) => {
+            this.mensaje.error('No se pudieron cargar las deudas pendientes. Intente más tarde.');
+            this.cargando = false;
+            this.dataSource.data = [];
+            console.error(err);
+        }
+    });
+}
   
-  // Si están todos seleccionados
+
+  aplicarFiltro(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  // --- LÓGICA DE SELECCIÓN ---
+
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
+    // Solo consideramos para la selección total las cuotas que NO están PAGADAS
+    const numRows = this.dataSource.data.filter(row => row.estado !== 'PAGADA').length;
     return numSelected === numRows;
   }
 
-  // Master Toggle (Seleccionar todo)
   toggleAllRows() {
     if (this.isAllSelected()) {
       this.selection.clear();
-      return;
+    } else {
+      // Selecciona solo las cuotas que NO están PAGADAS
+      this.dataSource.data.filter(row => row.estado !== 'PAGADA').forEach(row => this.selection.select(row));
     }
-    this.selection.select(...this.dataSource.data);
   }
+  
+  /** * FIX NG5002: Esta función calcula el total. 
+   * La llamamos desde el HTML para evitar el error de parseo. 
+   */
+  calcularTotalFlotante(): number {
+    return this.selection.selected.reduce((acc, curr) => {
+        const saldo = parseFloat(curr.saldo_pendiente);
+        return acc + (isNaN(saldo) ? 0 : saldo);
+    }, 0);
+  }
+
+  // --- LÓGICA DE COBRO Y COMPROBANTE ---
 
   cobrarSeleccionados() {
-    const seleccionados = this.selection.selected;
-    const pendientes = seleccionados.filter(s => s.estado === 'PENDIENTE' || s.estado === 'PARCIAL');
+    const total = this.calcularTotalFlotante();
+    const cuotas = this.selection.selected;
 
-    if (pendientes.length === 0) {
-      this.mensaje.error('Selecciona al menos una cuota PENDIENTE');
-      return;
-    }
-
-    const total = pendientes.reduce((acc, curr) => acc + parseFloat(curr.saldo_pendiente), 0);
-
-    // ABRIMOS EL MODAL DE CHECKOUT
+    // Abrir el diálogo de cobro
     const dialogRef = this.dialog.open(CobroDialogComponent, {
-      width: '400px',
-      data: { total: total, cantidad: pendientes.length }
+      width: '500px',
+      data: { total: total, cuotas: cuotas }
     });
 
-    dialogRef.afterClosed().subscribe(resultado => {
-      if (resultado) {
-        // Si el usuario confirmó, procedemos al cobro con los datos del modal
-        this.procesarCobro(pendientes, resultado);
-      }
-    });
-  }
-
-  procesarCobro(cuotas: any[], datosExtra: any) {
-    this.cargando = true;
-    
-    const payload = {
-      cuotas_ids: cuotas.map(p => p.id),
-      medio_pago: datosExtra.forma_pago,
-      observacion: datosExtra.observacion,
-      monto: datosExtra.monto_final // <--- ENVIAMOS EL MONTO EDITADO
-    };
-
-    this.api.registrarPagoMultiple(payload).subscribe({
-      next: (res: any) => {
-        this.cargando = false;
-        this.selection.clear();
-        this.cargarDeudas(); // Recargamos la tabla para que salga el botón nuevo
-
-        // ALERTA CON BOTÓN DE DESCARGA
-        if (res.url_pdf) {
-          Swal.fire({
-            title: '¡Cobro Exitoso! 💰',
-            text: 'El pago se registró correctamente.',
-            icon: 'success',
-            showCancelButton: true,
-            confirmButtonText: 'Ver Recibo PDF',
-            cancelButtonText: 'Cerrar'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.open(res.url_pdf, '_blank');
-            }
-          });
-        } else {
-          this.mensaje.exito('Pago registrado exitosamente');
-        }
-      },
-      error: (err) => {
-        // ... (tu manejo de errores) ...
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.cobroRegistrado) {
+        this.selection.clear(); // Limpiamos la selección
+        this.cargarDeudas(); // Recargamos la tabla
+        // Lógica de alerta movida al proceso del CobroDialogComponent si es necesario.
       }
     });
   }
 
   verComprobante(cuota: any) {
-    // Verificamos si la cuota tiene pagos asociados
     if (cuota.pagos && cuota.pagos.length > 0) {
-      // Tomamos el último pago realizado
       const ultimoPago = cuota.pagos[cuota.pagos.length - 1];
 
       if (ultimoPago.ruta_pdf) {
-        // Construimos la URL completa
-        // Asegúrate que esta URL coincida con tu backend (puerto 8000)
+        // Asegúrate que esta URL coincida con tu backend
         const url = `http://localhost:8000/storage/${ultimoPago.ruta_pdf}`;
         window.open(url, '_blank');
       } else {
-        this.mensaje.error('Esta cuota no tiene un PDF generado.');
+        this.mensaje.error('Esta cuota no tiene un comprobante PDF asociado.');
       }
-    } else {
-      // Caso raro: Está pagada pero no tiene registro en la tabla pagos
-      this.mensaje.error('No se encontró el registro del pago.');
     }
   }
 }

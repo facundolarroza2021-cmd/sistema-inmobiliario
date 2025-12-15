@@ -1,0 +1,180 @@
+/* Header similar a otras secciones */
+.header-indexacion {
+    margin-bottom: 24px;
+  }
+  .icon-box-indexacion {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    color: #3f51b5; /* Indigo de Angular Material */
+    border-radius: 10px;
+  }
+  
+  /* Buscador */
+  .search-field-indexacion {
+    min-width: 320px;
+    width: 100%;
+  }
+  
+  /* Mensaje contextual al inicio */
+  .hint-panel-index {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #5f6368;
+    background: #fff;
+    border-left: 4px solid #3f51b5;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  
+  /* Layout con dos columnas: parámetros a la izquierda y resumen/previa a la derecha */
+  .grid-2cols {
+    display: grid;
+    grid-template-columns: 1fr 0.8fr;
+    gap: 16px;
+  }
+  @media (max-width: 992px) {
+    .grid-2cols {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Stacks y filas internas */
+  .stack-12 {
+    display: grid;
+    gap: 12px;
+  }
+  .row-index {
+    display: grid;
+    gap: 12px;
+  }
+  .g-12 {
+    gap: 12px;
+  }
+  .col-6 { grid-column: span 1; }
+  .col-12 { grid-column: span 2; }
+  @media (max-width: 768px) {
+    .col-6, .col-12 { grid-column: span 2; }
+  }
+  
+  /* Botón alineado a la derecha */
+  .d-flex-end {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .mt-12 {
+    margin-top: 12px;
+  }
+  
+  /* Key/Value lineal para el resumen */
+  .kv {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed rgba(0,0,0,0.06);
+  }
+  .kv:last-child {
+    border-bottom: none;
+  }
+  .k {
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+  .v {
+    color: #111827;
+    font-weight: 500;
+  }
+  
+  /* Monto actual y nuevo monto */
+  .monto-actual {
+    font-weight: 700;
+    color: #111827;
+  }
+  .preview-box-index {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .preview-box-index .label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 2px;
+  }
+  .preview-box-index .monto-nuevo {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #2e7d32; /* Verde éxito */
+  }
+  .preview-box-index .hint {
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  /* Grid de parámetros: 2 columnas en desktop, 1 en mobile */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .field {
+    display: block;
+  }
+  .field-span-2 {
+    grid-column: span 2;
+  }
+  @media (max-width: 992px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+    .field-span-2 {
+      grid-column: span 1;
+    }
+  }
+
+/* Desactivar visualmente el panel derecho sin contrato */
+:host ::ng-deep form[ng-reflect-name="resumenForm"] .mat-card {
+    transition: opacity .2s ease;
+  }
+  .no-contrato .mat-card {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+/* 3 columnas en desktop para los parámetros */
+.form-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  
+  /* Responsive: 2 columnas en pantallas medianas, 1 en móviles */
+  @media (max-width: 992px) {
+    .form-grid-3 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 576px) {
+    .form-grid-3 {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Panel informativo bajo los campos */
+  .info-panel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    border-radius: 8px;
+    font-size: 0.92rem;
+  }

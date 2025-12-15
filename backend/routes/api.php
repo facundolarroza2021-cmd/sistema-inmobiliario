@@ -11,6 +11,7 @@ use App\Http\Controllers\LiquidacionController;
 use App\Http\Controllers\PagoController;
 use App\Http\Controllers\PropiedadController;
 use App\Http\Controllers\PropietarioController;
+use App\Http\Controllers\IndexacionController;
 use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // --- GRUPO 2: ADMINISTRATIVOS (Incluye Admin) ---
     Route::middleware('role:admin,administrativo')->group(function () {
 
+
+        // En routes/api.php
+        Route::get('/liquidaciones/previsualizar/{propietarioId}', [LiquidacionController::class, 'previsualizar']);
         // Propietarios
         Route::get('/propietarios', [PropietarioController::class, 'index']);
         Route::post('/propietarios', [PropietarioController::class, 'store']);
@@ -65,13 +69,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/tickets', [TicketController::class, 'index']);
         Route::post('/tickets', [TicketController::class, 'store']);
         Route::put('/tickets/{id}', [TicketController::class, 'update']);
-        
+
         Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
         Route::delete('/propiedades/{id}', [PropiedadController::class, 'destroy']);
         Route::delete('/inquilinos/{id}', [InquilinoController::class, 'destroy']);
         Route::delete('/propietarios/{id}', [PropietarioController::class, 'destroy']);
         Route::delete('/gastos/{id}', [GastoController::class, 'destroy']);
         Route::delete('/caja/{id}', [CajaController::class, 'destroy']);
+
+        Route::prefix('indexaciones')->group(function () {
+            // GET: Listar contratos activos aptos para ajuste
+            Route::get('/', [IndexacionController::class, 'index']); 
+            
+            // POST: Aplicar el ajuste a un contrato y sus cuotas futuras
+            Route::post('/', [IndexacionController::class, 'store']); 
+        });
     });
 
     //  COBRADORES ---
@@ -82,6 +94,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/propiedades', [PropiedadController::class, 'index']);
         Route::get('/propiedades/{id}', [PropiedadController::class, 'show']);
         Route::get('/propiedades/{id}/gastos', [GastoController::class, 'byPropiedad']);
+
+        Route::get('/cuotas/deudas', [CuotaController::class, 'getDeudasPendientes']);
 
         Route::get('/inquilinos', [InquilinoController::class, 'index']);
         Route::get('/contratos', [ContratoController::class, 'index']);

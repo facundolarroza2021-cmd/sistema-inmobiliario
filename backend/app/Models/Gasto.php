@@ -10,6 +10,13 @@ class Gasto extends Model
     use HasFactory;
 
     protected $guarded = [];
+    protected $fillable = [
+        'propiedad_id', 
+        'concepto',
+        'monto',
+        'fecha',
+        'responsable',
+    ];
 
     public function propiedad()
     {

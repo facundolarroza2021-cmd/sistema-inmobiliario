@@ -1,0 +1,49 @@
+/* CONTENIDO GENERAL */
+.dialog-content-cobro {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* separación entre bloques */
+    padding: 20px 24px;
+}
+
+/* RESUMEN */
+.summary-box {
+    padding: 16px;
+}
+
+/* TARJETA FORMULARIO */
+.form-card-cobro {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* separación interna */
+    padding: 20px;
+}
+
+/* TÍTULO DEL FORM */
+.form-card-cobro h4 {
+    margin-bottom: 4px;
+}
+
+/* FORM */
+.form-card-cobro form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* separación entre campos */
+}
+
+/* CAMPOS */
+mat-form-field {
+    width: 100%;
+}
+
+/* TEXTAREA MÁS ORDENADO */
+mat-form-field textarea {
+    min-height: 80px;
+}
+
+/* ACCIONES */
+.dialog-actions-cobro {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 24px;
+}

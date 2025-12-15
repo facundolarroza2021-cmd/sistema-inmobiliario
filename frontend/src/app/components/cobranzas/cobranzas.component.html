@@ -1,50 +1,44 @@
-<div class="container-fluid" style="padding: 20px;">
+<div class="container-fluid" style="padding: 30px 40px;">
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 20px;">
+    <div class="d-flex justify-content-between align-items-center mb-4 header-cobros">
       
-      <div style="display: flex; align-items: center; gap: 15px;">
-        <div style="background-color: #ff9800; padding: 10px; border-radius: 12px; color: white; display: flex;">
+      <div class="d-flex align-items-center gap-3">
+        <div class="icon-box-cobros">
           <mat-icon>point_of_sale</mat-icon>
         </div>
         <div>
-          <h1 style="margin: 0; font-size: 1.5rem; font-weight: 500;">Caja y Cobros</h1>
-          <small style="color: #666;">Gestión de deudas pendientes</small>
+          <h1 class="m-0 fw-bold fs-4">Caja y Cobros</h1>
+          <small class="text-muted">Gestión de deudas pendientes por inquilino/contrato.</small>
         </div>
       </div>
   
-      <button *ngIf="selection.selected.length > 0" 
-              mat-raised-button 
-              style="background-color: #4caf50; color: white; font-size: 1.1rem; padding: 5px 20px; animation: fadeIn 0.3s;"
-              (click)="cobrarSeleccionados()">
-        <mat-icon>checklist</mat-icon> 
-        COBRAR {{ selection.selected.length }} ITEMS
-      </button>
-  
-      <mat-form-field appearance="outline" style="width: 300px; font-size: 14px; margin-bottom: -1.25em;">
+      <mat-form-field appearance="outline" class="search-field">
         <mat-label>Buscar Inquilino o Periodo...</mat-label>
         <input matInput (keyup)="aplicarFiltro($event)" placeholder="Ej. Juan o 2025-01">
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
     </div>
   
-    <div *ngIf="cargando" style="display: flex; justify-content: center; padding: 50px;">
-      <mat-spinner diameter="50" color="accent"></mat-spinner>
+    <div *ngIf="cargando" class="loading-spinner">
+      <mat-spinner diameter="50" color="primary"></mat-spinner>
+      <p class="mt-2 text-muted">Cargando deudas pendientes...</p>
     </div>
   
-    <div class="mat-elevation-z2" [hidden]="cargando" style="border-radius: 12px; overflow: hidden; background: white;">
+    <div class="mat-elevation-z2 table-container-cobros" [hidden]="cargando">
       <table mat-table [dataSource]="dataSource" matSort>
   
         <ng-container matColumnDef="select">
-          <th mat-header-cell *matHeaderCellDef>
+          <th mat-header-cell *matHeaderCellDef class="col-select">
             <mat-checkbox (change)="$event ? toggleAllRows() : null"
                           [checked]="selection.hasValue() && isAllSelected()"
                           [indeterminate]="selection.hasValue() && !isAllSelected()">
             </mat-checkbox>
           </th>
-          <td mat-cell *matCellDef="let row">
+          <td mat-cell *matCellDef="let row" class="col-select">
             <mat-checkbox (click)="$event.stopPropagation()"
                           (change)="$event ? selection.toggle(row) : null"
-                          [checked]="selection.isSelected(row)">
+                          [checked]="selection.isSelected(row)"
+                          [disabled]="row.estado === 'PAGADA'">
             </mat-checkbox>
           </td>
         </ng-container>
@@ -52,7 +46,7 @@
         <ng-container matColumnDef="periodo">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Periodo </th>
           <td mat-cell *matCellDef="let element"> 
-            <span style="font-family: monospace; font-size: 1.1em; background: #f5f5f5; padding: 4px 8px; border-radius: 4px;">
+            <span class="periodo-badge">
               {{element.periodo}}
             </span>
           </td>
@@ -73,13 +67,13 @@
         </ng-container>
   
         <ng-container matColumnDef="monto">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header style="text-align: right;"> Saldo </th>
-          <td mat-cell *matCellDef="let element" style="text-align: right;"> 
-            <span *ngIf="element.saldo_pendiente > 0" style="color: #d32f2f; font-weight: bold; font-size: 1.1em;">
-              $ {{element.saldo_pendiente | number:'1.0-0'}}
+          <th mat-header-cell *matHeaderCellDef mat-sort-header class="text-end"> Saldo Pendiente </th>
+          <td mat-cell *matCellDef="let element" class="text-end col-monto"> 
+            <span class="monto-pendiente" *ngIf="element.saldo_pendiente > 0">
+              $ {{element.saldo_pendiente | number:'1.0-2'}}
             </span>
-            <span *ngIf="element.saldo_pendiente == 0" style="color: #2e7d32; font-weight: bold; opacity: 0.7;">
-              $ 0 <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">check</mat-icon>
+            <span class="monto-pagado" *ngIf="element.saldo_pendiente == 0">
+              $ 0 <mat-icon>check_circle</mat-icon>
             </span>
           </td>
         </ng-container>
@@ -87,42 +81,26 @@
         <ng-container matColumnDef="estado">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
           <td mat-cell *matCellDef="let element">
-            
-            <span *ngIf="element.estado === 'PAGADA'" 
-                  style="color: green; font-weight: bold; background: #e8f5e9; padding: 5px 10px; border-radius: 15px;">
-              PAGADO
-            </span>
-
-            <span *ngIf="element.estado === 'PENDIENTE'" 
-                  style="color: red; font-weight: bold; background: #ffebee; padding: 5px 10px; border-radius: 15px;">
-              PENDIENTE
-            </span>
-
-            <span *ngIf="element.estado === 'PARCIAL'" 
-                  style="color: orange; font-weight: bold; background: #fff3e0; padding: 5px 10px; border-radius: 15px;">
-              PARCIAL
-            </span>
-
+            <mat-chip-listbox>
+                <mat-chip-option 
+                    [color]="element.estado === 'PAGADA' ? 'success' : element.estado === 'PENDIENTE' ? 'warn' : 'primary'"
+                    [selected]="true"
+                    class="status-chip-cobros">
+                    {{ element.estado }}
+                </mat-chip-option>
+            </mat-chip-listbox>
           </td>
         </ng-container>
   
         <ng-container matColumnDef="accion">
-          <th mat-header-cell *matHeaderCellDef> Acción </th>
-          <td mat-cell *matCellDef="let element">
-
-            <mat-checkbox *ngIf="element.estado !== 'PAGADA'"
-                          (click)="$event.stopPropagation()"
-                          (change)="$event ? selection.toggle(element) : null"
-                          [checked]="selection.isSelected(element)">
-            </mat-checkbox>
-
+          <th mat-header-cell *matHeaderCellDef class="text-center"> Recibo </th>
+          <td mat-cell *matCellDef="let element" class="text-center">
             <button *ngIf="element.estado === 'PAGADA'" 
                     mat-mini-fab color="primary" 
                     matTooltip="Ver Recibo PDF"
                     (click)="verComprobante(element)">
               <mat-icon>picture_as_pdf</mat-icon>
             </button>
-
           </td>
         </ng-container>
   
@@ -130,13 +108,30 @@
         <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
   
         <tr class="mat-row" *matNoDataRow>
-          <td class="mat-cell" colspan="7" style="text-align: center; padding: 40px; color: #888;">
-            <mat-icon style="font-size: 40px; width: 40px; height: 40px; opacity: 0.5;">search_off</mat-icon>
+          <td class="mat-cell" colspan="7" class="no-data-row">
+            <mat-icon>search_off</mat-icon>
             <p>No se encontraron deudas.</p>
           </td>
         </tr>
       </table>
   
       <mat-paginator [pageSizeOptions]="[10, 20, 50]" showFirstLastButtons></mat-paginator>
+    </div>
+
+    <div *ngIf="selection.selected.length > 0" class="floating-action-bar-cobros shadow-lg">
+        <div class="d-flex justify-content-between align-items-center w-100">
+            
+            <div class="text-white resumen-flotante">
+                <span class="fs-6 d-block text-uppercase">Cobro Múltiple Seleccionado</span>
+                <strong class="fs-3 fw-bold">$ {{ calcularTotalFlotante() | number:'1.0-2'}}</strong>
+            </div>
+
+            <button mat-raised-button 
+                    class="btn-cobrar-flotante"
+                    (click)="cobrarSeleccionados()">
+                <mat-icon>checklist</mat-icon> 
+                PROCESAR COBRO ({{ selection.selected.length }} ITEMS)
+            </button>
+        </div>
     </div>
   </div>

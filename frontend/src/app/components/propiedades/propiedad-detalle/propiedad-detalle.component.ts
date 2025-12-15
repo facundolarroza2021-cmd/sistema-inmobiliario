@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
+import { EventosService } from '../../../services/eventos.service';
 
 @Component({
   selector: 'app-propiedad-detalle',
@@ -24,6 +25,7 @@ export class PropiedadDetalleComponent implements OnInit {
 
   propiedad: any = null;
 
+  private eventosService: EventosService = inject(EventosService);
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if(id) this.cargarDatos(+id);
@@ -83,6 +85,8 @@ export class PropiedadDetalleComponent implements OnInit {
         this.nuevoGasto = { concepto: '', monto: null, fecha: new Date().toISOString().split('T')[0], responsable: 'PROPIETARIO' }; 
         // Recargar la lista
         this.cargarGastos();
+
+        this.eventosService.emitirCuotasActualizadas();
       },
       error: (err) => {
         console.error('Error API:', err);

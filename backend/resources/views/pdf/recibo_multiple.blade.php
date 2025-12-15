@@ -14,14 +14,14 @@
 <body>
     <div class="header">
         <h2>RECIBO DE PAGO OFICIAL</h2>
-        <p>Comprobante: {{ $pago->codigo_comprobante }}</p>
-        <p>Fecha: {{ $pago->fecha_pago->format('d/m/Y') }}</p>
+        <p>Comprobante: {{ $pago_principal->codigo_comprobante }}</p>
+        <p>Fecha: {{ $pago_principal->fecha_pago->format('d/m/Y') }}</p>
     </div>
 
     <div class="info">
         <strong>Inquilino:</strong> {{ $contrato->inquilino->nombre_completo }} <br>
         <strong>Propiedad:</strong> {{ $contrato->propiedad->direccion }} <br>
-        <strong>Forma de Pago:</strong> {{ $pago->forma_pago }}
+        <strong>Forma de Pago:</strong> {{ $pago_principal->forma_pago }}
     </div>
 
     <h3>Conceptos Abonados:</h3>
@@ -33,17 +33,16 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($cuotas as $item)
-            <tr>
-                <td>Alquiler Periodo {{ $item->periodo }}</td>
-                <td>$ {{ number_format($item->monto_total, 2) }}</td>
-            </tr>
+            @foreach ($cuotas as $cuota)
+                <tr>
+                    <td>{{ $cuota->periodo }}</td> <td>{{ $cuota->importe }}</td>
+                </tr>
             @endforeach
         </tbody>
     </table>
 
     <div class="total">
-        TOTAL PAGADO: $ {{ number_format($pago->monto_pagado, 2) }}
+        TOTAL PAGADO: $ {{ number_format($pago_principal->monto_pagado, 2) }}
     </div>
 </body>
 </html>

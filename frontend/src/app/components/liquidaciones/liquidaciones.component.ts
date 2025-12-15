@@ -64,7 +64,7 @@ export class LiquidacionesComponent implements OnInit {
     ref.afterClosed().subscribe(result => {
       if (result) {
         // Hacemos la llamada a la API aquí
-        this.api.generarLiquidacion(result).subscribe((res: any) => {
+        this.api.crearLiquidacion(result).subscribe((res: any) => {
           this.mensaje.exito(`Liquidación Creada: $${res.resumen.a_pagar}`);
           if (res.url_pdf) window.open(res.url_pdf, '_blank');
           this.cargarDatos();

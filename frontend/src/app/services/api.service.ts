@@ -63,10 +63,6 @@ export class ApiService {
   getDashboardStats(): Observable<any> {
     return this.http.get(`${this.apiUrl}/dashboard`);
   }
-  //LIQUIDACIONES
-  generarLiquidacion(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/liquidaciones`, data);
-  }
   //CONTRATOS
   getContratos(): Observable<any> {
     return this.http.get(`${this.apiUrl}/contratos`);
@@ -74,10 +70,6 @@ export class ApiService {
   //FINALIZAR CONTRATO
   finalizarContrato(id: number): Observable<any> {
     return this.http.patch(`${this.apiUrl}/contratos/${id}/finalizar`, {});
-  }
-  //LIQUIDACIONES
-  getLiquidaciones(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/liquidaciones`);
   }
   // PAGOS MULTIPLES 
   registrarPagoMultiple(datos: any): Observable<any> {
@@ -159,4 +151,44 @@ export class ApiService {
   eliminarTicket(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/tickets/${id}`);
   }
+  // --- LIQUIDACIONES ---
+
+  // --- LIQUIDACIONES ---
+
+  // 1. Calcular (Previsualizar)
+  previsualizarLiquidacion(propietarioId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/liquidaciones/previsualizar/${propietarioId}`);
+  }
+
+  // 2. Guardar (Pagar)
+  crearLiquidacion(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/liquidaciones`, data);
+  }
+
+  // 3. Historial (la que ya tenías)
+  getLiquidaciones(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/liquidaciones`);
+  }
+
+  getDeudas(): Observable<any> {
+  return this.http.get(`${this.apiUrl}/cuotas/deudas`); 
+  }
+  // --- INDEXACIÓN ---
+  
+  /**
+   * Obtiene la lista de contratos activos aptos para ser indexados.
+   * Corresponde a GET /api/indexaciones
+   */
+  getContratosParaIndexar(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/indexaciones`);
+  }
+
+  /**
+   * Envía los datos del ajuste al backend para aplicar la indexación.
+   * Corresponde a POST /api/indexaciones
+   */
+  aplicarIndexacion(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/indexaciones`, payload);
+  }
+
 }

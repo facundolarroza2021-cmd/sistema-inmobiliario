@@ -13,6 +13,8 @@ import { PropiedadDetalleComponent } from './components/propiedades/propiedad-de
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { CajaComponent } from './components/caja/caja.component';
 import { TicketsComponent } from './components/tickets/tickets.component';
+import { IndexacionComponent } from './components/indexacion/indexacion.component';
+
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent }, // Ruta pública
@@ -35,6 +37,7 @@ export const routes: Routes = [
         { path: 'usuarios', component: UsuariosComponent },
         { path: 'mantenimiento', component: TicketsComponent },
         { path: 'caja', component: CajaComponent },
+        { path: 'indexacion', component: IndexacionComponent },
       ]
     },
 ];

@@ -1,49 +1,102 @@
-/* Cabecera y Buscador (Estándar) */
-.header-section { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; }
-.page-title { font-size: 1.8rem; font-weight: 700; color: #263238; margin: 0; }
-.page-subtitle { color: #546e7a; margin: 0; font-size: 0.95rem; }
-
-.btn-nuevo {
-    background: linear-gradient(135deg, #263238, #37474f); /* Gris oscuro profesional */
-    color: rgb(255, 255, 255); padding: 0 25px; height: 45px; border-radius: 25px; font-weight: 500;
+/* ---------------------------------------------------------------------
+   LIQUIDACIONES: ESTILO CARD-BASED FINANCIERO
+   --------------------------------------------------------------------- */
+.container-fluid {
+    padding: 30px 40px !important;
 }
 
-.search-bar-container {
-    background: white; padding: 12px 20px; border-radius: 30px;
-    display: flex; align-items: center; gap: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
-    max-width: 500px; border: 1px solid rgba(0,0,0,0.05);
-}
-.search-bar-container input { border: none; outline: none; font-size: 1rem; width: 100%; color: #444; }
-
-/* Tabla */
-.table-container { border-radius: 12px; overflow: hidden; background: white; border: 1px solid rgba(0,0,0,0.03); }
-th.mat-header-cell { font-size: 12px; text-transform: uppercase; color: #999; font-weight: 600; padding: 15px; }
-.hover-row:hover { background-color: #f5f5f5; }
-
-/* Perfil */
-.user-profile { display: flex; align-items: center; gap: 15px; padding: 8px 0; }
-.avatar {
-    width: 35px; height: 35px; border-radius: 50%; color: white;
-    display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px;
-}
-.user-info { display: flex; flex-direction: column; }
-.user-name { font-weight: 600; color: #333; font-size: 14px; }
-.user-email { font-size: 11px; color: #888; font-family: monospace; }
-
-/* Badge Periodo */
-.badge-periodo {
-    background: #e3f2fd; color: #1565c0;
-    padding: 4px 10px; border-radius: 4px;
-    font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+h2 {
+    font-weight: 600;
+    font-size: 1.8rem;
+    color: #333;
 }
 
-/* Monto Tag */
-.monto-tag {
-    font-family: 'Roboto', sans-serif;
-    font-size: 15px; font-weight: 700; color: #2e7d32;
+/* ---------------------------------------------------------------------
+   TARJETAS DE MÉTRICAS (KPIs)
+   --------------------------------------------------------------------- */
+
+.metric-card {
+    border-radius: 8px;
+    transition: transform 0.2s;
+    height: 100%; /* Asegura que todas tengan la misma altura */
 }
 
-/* WhatsApp */
-.btn-whatsapp { opacity: 0.6; transition: 0.2s; filter: grayscale(100%); }
-.btn-whatsapp:hover { opacity: 1; filter: grayscale(0%); transform: scale(1.1); }
+.metric-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.metric-card span.text-uppercase {
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+/* Fondos suaves para las métricas */
+.bg-success-light {
+    background-color: #e8f5e9 !important; /* Verde muy suave */
+}
+.bg-danger-light {
+    background-color: #ffebee !important; /* Rojo muy suave */
+}
+.bg-primary-light {
+    background-color: #f0f7ff !important; /* Azul muy suave */
+}
+
+/* Colores de texto */
+.text-success {
+    color: #28a745 !important;
+}
+.text-danger {
+    color: #dc3545 !important;
+}
+.text-primary {
+    color: #007bff !important;
+}
+
+/* ---------------------------------------------------------------------
+   TABLA DE DETALLE (LOG)
+   --------------------------------------------------------------------- */
+.detail-table th.mat-header-cell {
+    background-color: #e9ecef !important;
+    color: #333 !important;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 12px 18px !important;
+}
+
+.detail-table tr.mat-row {
+    height: 50px;
+}
+
+.detail-table .mat-cell {
+    font-size: 0.95rem;
+    color: #333;
+    padding: 10px 18px !important;
+}
+
+/* ---------------------------------------------------------------------
+   BARRA DE ACCIÓN FLOTANTE (NETO Y BOTÓN)
+   --------------------------------------------------------------------- */
+.fixed-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    border-top: 1px solid #ddd;
+    background-color: white !important;
+}
+
+.action-bar-container {
+    max-width: 1500px; /* Ajustar al max-width de tu contenido principal */
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.liquidar-btn {
+    font-weight: 600;
+    font-size: 1rem;
+    min-width: 250px;
+    padding: 15px 0 !important;
+}
