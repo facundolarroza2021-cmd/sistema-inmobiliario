@@ -32,3 +32,28 @@ h1 {
 .btn-nuevo {
     color: #ffffff !important;
 }
+/* Estilos Globales para Angular Material Snackbars (Deben ir en styles.css) */
+
+/* Éxito (Verde) */
+.snack-exito {
+background-color: #4CAF50 !important; 
+color: white !important;
+font-weight: 500;
+border-radius: 8px;
+}
+
+/* Error (Rojo) */
+.snack-error {
+background-color: #F44336 !important; 
+color: white !important;
+font-weight: 500;
+border-radius: 8px;
+}
+
+/* Advertencia (Naranja/Ámbar) - NECESARIO PARA mostrarAdvertencia() */
+.snack-advertencia {
+background-color: #FF9800 !important; 
+color: black !important; /* Mejor contraste con texto oscuro */
+font-weight: 500;
+border-radius: 8px;
+}

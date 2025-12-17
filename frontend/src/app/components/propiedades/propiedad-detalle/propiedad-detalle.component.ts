@@ -40,10 +40,10 @@ export class PropiedadDetalleComponent implements OnInit {
     const archivo = event.target.files[0];
     if (archivo) {
       this.api.subirFotoPropiedad(this.propiedad.id, archivo).subscribe(res => {
-        this.mensaje.exito('Foto subida correctamente');
+        this.mensaje.mostrarExito('Foto subida correctamente');
         // Recargar datos para ver la foto nueva
         this.cargarDatos(this.propiedad.id);
-      }, err => this.mensaje.error('Error al subir imagen'));
+      }, err => this.mensaje.mostrarError('Error al subir imagen'));
     }
   }
   // Variables
@@ -61,13 +61,13 @@ export class PropiedadDetalleComponent implements OnInit {
 
     // 2. Validación con Mensaje
     if (!this.nuevoGasto.concepto || !this.nuevoGasto.monto) {
-      this.mensaje.error('Por favor completa el Concepto y el Monto');
+      this.mensaje.mostrarError('Por favor completa el Concepto y el Monto');
       return;
     }
     
     // 3. Verificar que tengamos el ID de la propiedad
     if (!this.propiedad || !this.propiedad.id) {
-      this.mensaje.error('Error: No se identificó la propiedad');
+      this.mensaje.mostrarError('Error: No se identificó la propiedad');
       return;
     }
 
@@ -80,7 +80,7 @@ export class PropiedadDetalleComponent implements OnInit {
 
     this.api.crearGasto(data).subscribe({
       next: () => {
-        this.mensaje.exito('Gasto registrado correctamente');
+        this.mensaje.mostrarExito('Gasto registrado correctamente');
         // Resetear formulario
         this.nuevoGasto = { concepto: '', monto: null, fecha: new Date().toISOString().split('T')[0], responsable: 'PROPIETARIO' }; 
         // Recargar la lista
@@ -90,7 +90,7 @@ export class PropiedadDetalleComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error API:', err);
-        this.mensaje.error('Error al guardar el gasto');
+        this.mensaje.mostrarError('Error al guardar el gasto');
       }
     });
   }
@@ -98,7 +98,7 @@ export class PropiedadDetalleComponent implements OnInit {
   borrarGasto(id: number) {
       if(confirm('¿Borrar gasto?')) {
           this.api.eliminarGasto(id).subscribe(() => {
-              this.mensaje.exito('Eliminado');
+              this.mensaje.mostrarExito('Eliminado');
               this.cargarGastos();
           });
       }

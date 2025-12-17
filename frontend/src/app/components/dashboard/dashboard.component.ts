@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router'; // Para los botones de acceso rápido
 import { ApiService } from '../../services/api.service';
+import { Title } from '@angular/platform-browser';
 
 // Material Imports
 import { MatCardModule } from '@angular/material/card';
@@ -22,6 +23,7 @@ import { MatDividerModule } from '@angular/material/divider';
 })
 export class DashboardComponent implements OnInit {
   private api = inject(ApiService);
+  private title = inject(Title);
   
   data: any = {
     total_propiedades: 0,
@@ -36,5 +38,6 @@ export class DashboardComponent implements OnInit {
     this.api.getDashboardStats().subscribe(res => {
       this.data = res;
     });
+    this.title.setTitle('Gestion | Dashboard');
   }
 }

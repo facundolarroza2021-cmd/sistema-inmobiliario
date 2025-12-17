@@ -1,0 +1,80 @@
+/* Estilos para Liquidacion Dialog (Similar a Inquilino Dialog) */
+
+/* ---------------- HEADER ---------------- */
+.dialog-header {
+    /* Usamos el color pink/fucsia para el encabezado de Liquidación */
+    background: #e91e63 !important; /* Pink (Fucsia) */ 
+    color: white; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
+    padding: 15px 24px; 
+    margin: -24px -24px 0 -24px; 
+}
+
+.dialog-header mat-icon {
+    color: white; /* Icono blanco */
+}
+
+/* ---------------- INFO BOX ---------------- */
+.info-box {
+    padding: 15px; 
+    border-radius: 8px; 
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.pink-info-box {
+    background: #f8bbd0; /* Rosa muy claro para el fondo */
+    border-left: 5px solid #e91e63; /* Borde fucsia */
+    color: #444;
+}
+
+.info-icon {
+    font-size: 20px; 
+    width: 20px; 
+    height: 20px; 
+    color: #e91e63; /* Icono fucsia */
+    flex-shrink: 0;
+}
+
+/* ---------------- CONTENT ---------------- */
+.dialog-content-custom {
+    padding-top: 20px !important; 
+    min-width: 400px;
+}
+
+.form-fields-container {
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+/* ---------------- FOOTER & BUTTONS ---------------- */
+.dialog-actions-custom {
+    padding: 15px 24px 15px 24px !important;
+}
+
+.gray-footer {
+    background: #f9f9f9; 
+    border-top: 1px solid #eee;
+}
+
+.pink-confirm {
+    background-color: #e91e63 !important; /* Fucsia para el botón principal */
+    color: white;
+}
+
+/* ---------------- RESPONSIVIDAD ---------------- */
+@media (max-width: 600px) {
+    .dialog-content-custom {
+        min-width: unset; 
+    }
+}

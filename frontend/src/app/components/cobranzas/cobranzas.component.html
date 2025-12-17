@@ -3,9 +3,6 @@
     <div class="d-flex justify-content-between align-items-center mb-4 header-cobros">
       
       <div class="d-flex align-items-center gap-3">
-        <div class="icon-box-cobros">
-          <mat-icon>point_of_sale</mat-icon>
-        </div>
         <div>
           <h1 class="m-0 fw-bold fs-4">Caja y Cobros</h1>
           <small class="text-muted">Gestión de deudas pendientes por inquilino/contrato.</small>
@@ -81,29 +78,31 @@
         <ng-container matColumnDef="estado">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado </th>
           <td mat-cell *matCellDef="let element">
-            <mat-chip-listbox>
-                <mat-chip-option 
-                    [color]="element.estado === 'PAGADA' ? 'success' : element.estado === 'PENDIENTE' ? 'warn' : 'primary'"
-                    [selected]="true"
-                    class="status-chip-cobros">
-                    {{ element.estado }}
-                </mat-chip-option>
-            </mat-chip-listbox>
+            <span class="status-badge-soft" 
+                  [ngClass]="{
+                    'status-pagada': element.estado === 'PAGADA',
+                    'status-pendiente': element.estado === 'PENDIENTE',
+                    'status-parcial': element.estado === 'PARCIAL'
+                  }">
+              {{ element.estado }}
+            </span>
           </td>
         </ng-container>
-  
+        
         <ng-container matColumnDef="accion">
           <th mat-header-cell *matHeaderCellDef class="text-center"> Recibo </th>
           <td mat-cell *matCellDef="let element" class="text-center">
-            <button *ngIf="element.estado === 'PAGADA'" 
-                    mat-mini-fab color="primary" 
-                    matTooltip="Ver Recibo PDF"
-                    (click)="verComprobante(element)">
-              <mat-icon>picture_as_pdf</mat-icon>
-            </button>
+            @if (element.pagos && element.pagos.length > 0 && element.pagos[element.pagos.length - 1].ruta_pdf) {
+              <button mat-icon-button color="warn" matTooltip="Ver Recibo" (click)="verComprobante(element)">
+                <mat-icon>picture_as_pdf</mat-icon>
+              </button>
+            } @else if (element.estado !== 'PENDIENTE') {
+              <mat-icon class="text-muted" style="font-size: 18px;" matTooltip="PDF no generado">history_edu</mat-icon>
+            } @else {
+              <span class="text-muted">-</span>
+            }
           </td>
         </ng-container>
-  
         <tr mat-header-row *matHeaderRowDef="columnas"></tr>
         <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
   

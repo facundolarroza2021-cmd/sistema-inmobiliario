@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { Title } from '@angular/platform-browser';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
@@ -29,6 +30,7 @@ export class CajaComponent implements OnInit {
   private apiService = inject(ApiService);
   public authService = inject(AuthService); // Público para usar en HTML
   private snackBar = inject(MatSnackBar);
+  private title = inject(Title);
 
   // Datos
   movimientos: any[] = [];
@@ -61,6 +63,7 @@ export class CajaComponent implements OnInit {
 
   ngOnInit() {
     this.cargarDatos();
+    this.title.setTitle('Gestion | Caja');
   }
 
   cargarDatos() {

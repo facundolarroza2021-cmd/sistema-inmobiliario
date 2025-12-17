@@ -59,8 +59,17 @@
                       <td>{{ c.fecha_inicio }}</td>
                       <td>{{ c.fecha_fin }}</td>
                       <td>
-                          <span [style.color]="c.activo ? 'green' : 'grey'">
-                              {{ c.activo ? 'VIGENTE' : 'FINALIZADO' }}
+                            <span [ngStyle]="{
+                                'background-color': (c.activo && c.estado !== 'FINALIZADO') ? '#d4edda' : '#f8d7da',
+                                'color': (c.activo && c.estado !== 'FINALIZADO') ? '#155724' : '#721c24',
+                                'padding': '4px 10px',
+                                'border-radius': '4px',
+                                'font-size': '11px',
+                                'font-weight': 'bold',
+                                'display': 'inline-block',
+                                'border': (c.activo && c.estado !== 'FINALIZADO') ? '1px solid #c3e6cb' : '1px solid #f5c6cb'
+                            }">
+                            {{ (c.activo && c.estado !== 'FINALIZADO') ? 'VIGENTE' : 'FINALIZADO' }}
                           </span>
                       </td>
                   </tr>

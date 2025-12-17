@@ -19,7 +19,8 @@ import { MatIconModule } from '@angular/material/icon';
     CommonModule, FormsModule, MatDialogModule, MatFormFieldModule, 
     MatInputModule, MatButtonModule, MatSelectModule, MatIconModule
   ],
-  templateUrl: './liquidacion-dialog.component.html'
+  templateUrl: './liquidacion-dialog.component.html',
+  styleUrl: './liquidacion-dialog.component.css'
 })
 export class LiquidacionDialogComponent implements OnInit {
   private api = inject(ApiService);
@@ -31,12 +32,24 @@ export class LiquidacionDialogComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<LiquidacionDialogComponent>) {}
 
   ngOnInit() {
-    this.api.getPropietarios().subscribe(res => this.listaPropietarios = res);
+    this.api.getPropietarios().subscribe(res => {
+        // *** CORRECCIÓN CLAVE AQUÍ ***
+        // Asumiendo que la respuesta es { data: [...] } o similar
+        if (Array.isArray(res)) {
+            this.listaPropietarios = res; // Si el API devuelve el array directamente
+        } else if (res && res.data && Array.isArray(res.data)) {
+            this.listaPropietarios = res.data; // Si el API devuelve { data: [...] }
+        } else {
+            // Manejo de error si el formato es inesperado
+            this.mensaje.mostrarError('Error al cargar propietarios: formato de datos inesperado.');
+            console.error('API Response format error:', res);
+        }
+    });
   }
 
   confirmar() {
     if (!this.data.propietario_id || !this.data.periodo) {
-      this.mensaje.error('Completa los datos');
+      this.mensaje.mostrarError('Completa los datos');
       return;
     }
     // Cerramos y devolvemos los datos para que el componente padre haga la llamada

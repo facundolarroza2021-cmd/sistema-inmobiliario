@@ -53,22 +53,22 @@ export class PropiedadDialogComponent implements OnInit {
 
   guardar() {
     if (!this.nuevaPropiedad.direccion || !this.nuevaPropiedad.propietario_id) {
-      this.mensaje.error('Dirección y Propietario son obligatorios');
+      this.mensaje.mostrarError('Dirección y Propietario son obligatorios');
       return;
     }
 
     if (this.data) {
       // --- MODO EDICIÓN ---
       this.api.editarPropiedad(this.data.id, this.nuevaPropiedad).subscribe(() => {
-        this.mensaje.exito('Propiedad actualizada');
+        this.mensaje.mostrarExito('Propiedad actualizada');
         this.dialogRef.close(true);
-      }, err => this.mensaje.error('Error al actualizar'));
+      }, err => this.mensaje.mostrarError('Error al actualizar'));
     } else {
       // --- MODO CREACIÓN ---
       this.api.crearPropiedad(this.nuevaPropiedad).subscribe(() => {
-        this.mensaje.exito('Propiedad creada');
+        this.mensaje.mostrarExito('Propiedad creada');
         this.dialogRef.close(true);
-      }, err => this.mensaje.error('Error al crear'));
+      }, err => this.mensaje.mostrarError('Error al crear'));
     }
   }
 }

@@ -13,6 +13,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCardModule } from '@angular/material/card'; // <-- ¡IMPORTAR ESTE MÓDULO!
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-liquidaciones',
@@ -20,7 +22,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   imports: [
     CommonModule, MatTableModule, MatPaginatorModule, MatSortModule, 
     MatDialogModule, MatButtonModule, MatIconModule, MatInputModule, 
-    MatFormFieldModule
+    MatFormFieldModule, MatCardModule, MatChipsModule
   ],
   templateUrl: './liquidaciones.component.html',
   styleUrl: './liquidaciones.component.css'
@@ -65,10 +67,10 @@ export class LiquidacionesComponent implements OnInit {
       if (result) {
         // Hacemos la llamada a la API aquí
         this.api.crearLiquidacion(result).subscribe((res: any) => {
-          this.mensaje.exito(`Liquidación Creada: $${res.resumen.a_pagar}`);
+          this.mensaje.mostrarExito(`Liquidación Creada: $${res.resumen.a_pagar}`);
           if (res.url_pdf) window.open(res.url_pdf, '_blank');
           this.cargarDatos();
-        }, (err) => this.mensaje.error(err.error.error || err.message));
+        }, (err) => this.mensaje.mostrarError(err.error.error || err.message));
       }
     });
   }

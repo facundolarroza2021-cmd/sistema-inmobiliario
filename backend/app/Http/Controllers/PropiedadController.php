@@ -175,6 +175,30 @@ class PropiedadController extends Controller
         return response()->json(['mensaje' => 'Foto subida', ...$resultado]);
     }
 
+    public function update(Request $request, $id)
+    {
+        // 1. Validamos los datos (puedes incluir 'localidad' aquí)
+        $validated = $request->validate([
+            'propietario_id'  => 'required|exists:propietarios,id',
+            'direccion'       => 'required|string',
+            'localidad'       => 'nullable|string', // Añadido para el PDF profesional
+            'tipo'            => 'required|string',
+            'precio_alquiler' => 'nullable|numeric',
+            'comision'        => 'nullable|numeric',
+            'estado'          => 'nullable|string',
+            'disponible'      => 'nullable|boolean'
+        ]);
+
+        // 2. Llamamos al servicio para ejecutar la actualización
+        // Asegúrate de que tu PropiedadService tenga el método actualizarPropiedad
+        $propiedad = $this->propiedadService->actualizarPropiedad($id, $validated);
+
+        return response()->json([
+            'message' => 'Propiedad actualizada con éxito',
+            'data' => $propiedad
+        ]);
+    }
+
     /**
      * @OA\Delete(
      * path="/api/propiedades/{id}",
@@ -208,7 +232,9 @@ class PropiedadController extends Controller
     {
         $propiedad = \App\Models\Propiedad::findOrFail($id);
 
-        Gate::authorize('delete', $propiedad);
+        if (!auth()->user()->hasRole('admin')) {
+            return response()->json(['message' => 'No tienes permisos para eliminar propiedades'], 403);
+        }
 
         $this->propiedadService->eliminarPropiedad($id);
 

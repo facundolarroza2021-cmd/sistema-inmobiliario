@@ -46,6 +46,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/propietarios', [PropietarioController::class, 'index']);
         Route::post('/propietarios', [PropietarioController::class, 'store']);
         Route::get('/propietarios/{id}', [PropietarioController::class, 'show']);
+        Route::put('/propietarios/{id}', [PropietarioController::class, 'update']);
+        Route::delete('/propietarios/{id}', [PropietarioController::class, 'destroy']);
 
         // Propiedades (Edición)
         Route::post('/propiedades', [PropiedadController::class, 'store']);
@@ -73,16 +75,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/tickets/{id}', [TicketController::class, 'destroy']);
         Route::delete('/propiedades/{id}', [PropiedadController::class, 'destroy']);
         Route::delete('/inquilinos/{id}', [InquilinoController::class, 'destroy']);
-        Route::delete('/propietarios/{id}', [PropietarioController::class, 'destroy']);
         Route::delete('/gastos/{id}', [GastoController::class, 'destroy']);
         Route::delete('/caja/{id}', [CajaController::class, 'destroy']);
 
-        Route::prefix('indexaciones')->group(function () {
-            // GET: Listar contratos activos aptos para ajuste
-            Route::get('/', [IndexacionController::class, 'index']); 
+        Route::prefix('indexacion')->group(function () {
+            // Endpoint para previsualizar los contratos afectados antes de aplicar el ajuste
+            Route::post('previsualizar', [IndexacionController::class, 'previsualizar']);
             
-            // POST: Aplicar el ajuste a un contrato y sus cuotas futuras
-            Route::post('/', [IndexacionController::class, 'store']); 
+            // Endpoint para aplicar el ajuste masivo a los contratos seleccionados
+            Route::post('aplicar', [IndexacionController::class, 'aplicar']);
         });
     });
 

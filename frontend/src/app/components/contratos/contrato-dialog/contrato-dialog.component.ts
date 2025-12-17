@@ -95,7 +95,7 @@ export class ContratoDialogComponent implements OnInit {
   agregarGarante() {
     // Validar datos mínimos
     if (!this.nuevoGarante.nombre_completo || !this.nuevoGarante.dni) {
-      this.mensaje.error('El Nombre y DNI del garante son obligatorios');
+      this.mensaje.mostrarError('El Nombre y DNI del garante son obligatorios');
       return;
     }
 
@@ -120,7 +120,7 @@ export class ContratoDialogComponent implements OnInit {
   guardar() {
     // 1. Validaciones básicas
     if (!this.nuevoContrato.inquilino_id || !this.nuevoContrato.propiedad_id || !this.nuevoContrato.monto_actual) {
-        this.mensaje.error('Faltan datos obligatorios (Inquilino, Propiedad o Monto)');
+        this.mensaje.mostrarError('Faltan datos obligatorios (Inquilino, Propiedad o Monto)');
         return;
     }
 
@@ -163,14 +163,14 @@ export class ContratoDialogComponent implements OnInit {
     // --- ENVIAMOS ---
     this.api.crearContrato(formData).subscribe({
         next: () => {
-            this.mensaje.exito('Contrato guardado con éxito');
+            this.mensaje.mostrarExito('Contrato guardado con éxito');
             this.dialogRef.close(true);
         },
         error: (err) => {
             console.error('Error del servidor:', err);
             // Mostramos el mensaje exacto que devuelve Laravel si existe
             const errorMsg = err.error?.message || 'Error al guardar contrato';
-            this.mensaje.error(errorMsg);
+            this.mensaje.mostrarError(errorMsg);
         }
     });
   }

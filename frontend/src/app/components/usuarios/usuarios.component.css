@@ -1,21 +1,91 @@
-.container-usuario {
-    padding: 20px;
-    display: flex;
-    justify-content: center;
+/* ---------------------------------------------------
+ * Contenedor Principal
+ * --------------------------------------------------- */
+ .container-usuario {
+  /* Centrar la tarjeta en la vista */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Relleno superior para que no choque con el header */
+  padding-top: 40px; 
+  padding-bottom: 40px; 
+  /* Altura mínima para asegurar que el centrado funcione */
+  min-height: calc(100vh - 64px); /* Asumiendo un header de 64px */
+  background-color: #f5f5f5; /* Fondo suave para destacar la tarjeta */
+}
+
+/* ---------------------------------------------------
+* Tarjeta de Formulario
+* --------------------------------------------------- */
+.card-usuario {
+  width: 90%; /* Ancho base */
+  max-width: 500px; /* Ancho máximo en escritorio */
+  border-radius: 12px; /* Esquinas redondeadas suaves */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+/* ---------------------------------------------------
+* Encabezado de la Tarjeta (Mat-Card-Header)
+* --------------------------------------------------- */
+.card-header-flex {
+  display: flex;
+  align-items: center;
+  padding-bottom: 15px; /* Separación del contenido */
+  border-bottom: 1px solid #eee; /* Línea separadora */
+}
+
+.card-header-flex mat-icon {
+  /* Estilo para el icono mat-card-avatar */
+  font-size: 28px;
+  height: 28px;
+  width: 28px;
+  margin-right: 15px;
+  color: var(--mat-accent-color); /* Usar el color acento de Material */
+}
+
+.card-usuario mat-card-title {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-usuario mat-card-subtitle {
+  color: #777;
+  margin-top: 4px;
+}
+
+/* ---------------------------------------------------
+* Formulario y Campos (Mat-Form-Field)
+* --------------------------------------------------- */
+.responsive-form {
+  padding-top: 15px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 5px; /* Espacio extra entre campos */
+}
+
+/* Estilo para el botón de enviar */
+.submit-button {
+  margin-top: 20px;
+  padding: 10px 0;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* ---------------------------------------------------
+* Responsividad (Asegura que se vea bien en móviles)
+* --------------------------------------------------- */
+@media (max-width: 599px) {
+  .container-usuario {
+      /* Quitar el padding superior en móviles */
+      padding-top: 20px;
   }
-  
   .card-usuario {
-    width: 100%;
-    max-width: 500px;
+      width: 100%; /* Ocupar todo el ancho disponible */
+      max-width: none;
+      margin: 0 10px; /* Un poco de margen lateral */
+      box-shadow: none; /* Quitar sombra en móviles para un look más nativo */
   }
-  
-  .full-width {
-    width: 100%;
-    margin-bottom: 15px;
-  }
-  
-  button {
-    height: 50px;
-    font-size: 16px;
-    margin-top: 10px;
-  }
+}

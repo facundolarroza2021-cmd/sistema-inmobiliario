@@ -24,6 +24,7 @@ class CuotaController extends Controller
         // Carga las relaciones que necesitas para mostrar en la tabla (inquilino, propiedad)
         $deudas = Cuota::where('estado', '!=', 'PAGADA')
                         ->with([
+                            'pagos',
                             'contrato' => function ($query) {
                                 $query->with('inquilino', 'propiedad');
                             }

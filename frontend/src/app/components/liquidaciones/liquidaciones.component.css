@@ -1,102 +1,129 @@
-/* ---------------------------------------------------------------------
-   LIQUIDACIONES: ESTILO CARD-BASED FINANCIERO
-   --------------------------------------------------------------------- */
-.container-fluid {
-    padding: 30px 40px !important;
+/* ---------------------------------------------------
+ * Contenedor Principal
+ * --------------------------------------------------- */
+ .main-container {
+    padding: 20px;
+    background-color: #f5f5f5;
+    min-height: calc(100vh - 64px); /* Ajuste para el header principal */
 }
 
-h2 {
+.liquidaciones-card {
+    border-radius: 10px;
+}
+
+/* ---------------------------------------------------
+ * Encabezado y Acciones (Header con Flexbox)
+ * --------------------------------------------------- */
+.card-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    margin-bottom: 10px;
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espacio entre icono y texto */
+}
+
+.header-icon {
+    font-size: 32px;
+    height: 32px;
+    width: 32px;
+}
+
+.liquidaciones-card mat-card-title {
+    font-size: 1.4em;
     font-weight: 600;
-    font-size: 1.8rem;
-    color: #333;
 }
 
-/* ---------------------------------------------------------------------
-   TARJETAS DE MÉTRICAS (KPIs)
-   --------------------------------------------------------------------- */
+.liquidaciones-card mat-card-subtitle {
+    color: #777;
+    margin-top: 2px;
+}
 
-.metric-card {
+/* ---------------------------------------------------
+ * Controles de la Tabla
+ * --------------------------------------------------- */
+.table-controls {
+    display: flex;
+    justify-content: flex-end; /* Alinear el filtro a la derecha */
+    margin-bottom: 15px;
+}
+
+.filter-field {
+    width: 100%;
+    max-width: 300px;
+}
+
+/* ---------------------------------------------------
+ * Estilos de la Tabla
+ * --------------------------------------------------- */
+.table-container {
+    overflow-x: auto; /* Permite scroll horizontal en móviles */
     border-radius: 8px;
-    transition: transform 0.2s;
-    height: 100%; /* Asegura que todas tengan la misma altura */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.metric-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1) !important;
+.mat-table {
+    width: 100%;
+    min-width: 700px; /* Asegura un ancho mínimo para la legibilidad */
 }
 
-.metric-card span.text-uppercase {
-    font-size: 0.8rem;
-    letter-spacing: 0.5px;
-    font-weight: 500;
-}
-
-/* Fondos suaves para las métricas */
-.bg-success-light {
-    background-color: #e8f5e9 !important; /* Verde muy suave */
-}
-.bg-danger-light {
-    background-color: #ffebee !important; /* Rojo muy suave */
-}
-.bg-primary-light {
-    background-color: #f0f7ff !important; /* Azul muy suave */
-}
-
-/* Colores de texto */
-.text-success {
-    color: #28a745 !important;
-}
-.text-danger {
-    color: #dc3545 !important;
-}
-.text-primary {
-    color: #007bff !important;
-}
-
-/* ---------------------------------------------------------------------
-   TABLA DE DETALLE (LOG)
-   --------------------------------------------------------------------- */
-.detail-table th.mat-header-cell {
-    background-color: #e9ecef !important;
-    color: #333 !important;
+.mat-header-cell {
+    background-color: #eef1f3;
     font-weight: 600;
-    font-size: 0.8rem;
-    padding: 12px 18px !important;
+    color: #444;
 }
 
-.detail-table tr.mat-row {
-    height: 50px;
+/* Avatar del Propietario */
+.propietario-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.detail-table .mat-cell {
-    font-size: 0.95rem;
-    color: #333;
-    padding: 10px 18px !important;
+.avatar {
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    flex-shrink: 0;
 }
 
-/* ---------------------------------------------------------------------
-   BARRA DE ACCIÓN FLOTANTE (NETO Y BOTÓN)
-   --------------------------------------------------------------------- */
-.fixed-action-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    border-top: 1px solid #ddd;
-    background-color: white !important;
-}
-
-.action-bar-container {
-    max-width: 1500px; /* Ajustar al max-width de tu contenido principal */
-    margin: 0 auto;
-    padding: 0 40px;
-}
-
-.liquidar-btn {
+/* Monto Pagado (Estilo de énfasis) */
+.monto-pagado {
     font-weight: 600;
-    font-size: 1rem;
-    min-width: 250px;
-    padding: 15px 0 !important;
+    color: #2e7d32; /* Verde fuerte para el dinero */
+}
+
+/* ---------------------------------------------------
+ * Responsividad
+ * --------------------------------------------------- */
+@media (max-width: 768px) {
+    .card-header-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .btn-new-liquidacion {
+        width: 100%;
+    }
+
+    .table-controls {
+        justify-content: flex-start;
+    }
+
+    .filter-field {
+        max-width: none;
+    }
 }

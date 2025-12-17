@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsModule } from '@angular/material/chips';
 import { ContratoDetalleComponent } from './contrato-detalle/contrato-detalle.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-contratos',
@@ -29,6 +30,7 @@ import { ContratoDetalleComponent } from './contrato-detalle/contrato-detalle.co
 export class ContratosComponent implements OnInit {
   private api = inject(ApiService);
   private dialog = inject(MatDialog);
+  private title = inject(Title);
 
   columnas: string[] = ['id', 'propiedad', 'inquilino', 'vigencia', 'estado', 'acciones'];
   dataSource = new MatTableDataSource<any>([]);
@@ -38,6 +40,7 @@ export class ContratosComponent implements OnInit {
 
   ngOnInit() {
     this.cargarDatos();
+    this.title.setTitle('Gestion | Contratos');
   }
 
   cargarDatos() {

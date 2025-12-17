@@ -1,42 +1,48 @@
-<h2 mat-dialog-title style="background: #263238; color: white; display: flex; align-items: center; gap: 10px;">
-    <mat-icon>point_of_sale</mat-icon>
-    Nueva Liquidación
-  </h2>
+<h2 mat-dialog-title class="dialog-header liquidacion-header">
+  <mat-icon>point_of_sale</mat-icon>
+  Generar Liquidación
+</h2>
+
+<mat-dialog-content class="dialog-content-custom">
   
-  <mat-dialog-content style="padding-top: 20px; min-width: 400px;">
+  <div class="info-box pink-info-box">
+    <mat-icon class="info-icon">info</mat-icon>
+    <p>
+      El sistema calculará: <strong>Alquiler - Comisión = Monto a Liquidar</strong> para el período seleccionado.
+    </p>
+  </div>
+
+  <div class="form-fields-container">
     
-    <div style="background: #eceff1; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-      <p style="margin: 0; color: #546e7a; font-size: 13px;">
-        <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">info</mat-icon>
-        El sistema calculará automáticamente: <strong>Alquiler - Comisión = A Pagar</strong>.
-      </p>
-    </div>
-  
-    <div style="display: flex; flex-direction: column; gap: 15px;">
-      
-      <mat-form-field appearance="outline">
-        <mat-label>Seleccionar Propietario</mat-label>
-        <mat-select [(ngModel)]="data.propietario_id">
-          <mat-option *ngFor="let p of listaPropietarios" [value]="p.id">
-            {{ p.nombre_completo }}
-          </mat-option>
-        </mat-select>
-        <mat-icon matSuffix>person</mat-icon>
-      </mat-form-field>
-  
-      <mat-form-field appearance="outline">
-        <mat-label>Periodo a Liquidar</mat-label>
-        <input matInput type="month" [(ngModel)]="data.periodo">
-        <mat-icon matSuffix>calendar_today</mat-icon>
-      </mat-form-field>
-  
-    </div>
-  
-  </mat-dialog-content>
-  
-  <mat-dialog-actions align="end" style="padding: 15px;">
-    <button mat-button mat-dialog-close>Cancelar</button>
-    <button mat-raised-button color="primary" style="background-color: #263238;" (click)="confirmar()">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Propietario</mat-label>
+      <mat-select [(ngModel)]="data.propietario_id" required>
+        <mat-option *ngFor="let p of listaPropietarios" [value]="p.id">
+          {{ p.nombre_completo }}
+        </mat-option>
+      </mat-select>
+      <mat-icon matSuffix>person</mat-icon>
+      <mat-error *ngIf="!data.propietario_id">El propietario es obligatorio.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Período a Liquidar (YYYY-MM)</mat-label>
+      <input matInput type="month" [(ngModel)]="data.periodo" required placeholder="Ej: 2025-12">
+      <mat-icon matSuffix>calendar_today</mat-icon>
+      <mat-error *ngIf="!data.periodo">El período es obligatorio.</mat-error>
+    </mat-form-field>
+
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions-custom gray-footer">
+  <button mat-button mat-dialog-close>Cancelar</button>
+  <button mat-raised-button 
+          color="primary" 
+          class="confirm-button pink-confirm" 
+          (click)="confirmar()"
+          [disabled]="!data.propietario_id || !data.periodo">
       <mat-icon>calculate</mat-icon> Generar Pago
-    </button>
-  </mat-dialog-actions>
+  </button>
+</mat-dialog-actions>

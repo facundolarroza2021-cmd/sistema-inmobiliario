@@ -2,14 +2,36 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+interface ContratoIndexable {
+  id: number;
+  inquilino: { nombre_completo: string };
+  monto_alquiler: number;
+  cuotas_afectadas: number;
+  nuevo_monto_alquiler: number; 
+  // ...
+}
+
+interface PrevisualizarResponse {
+  message: string;
+  contratos: ContratoIndexable[];
+}
+
+interface AplicarResponse {
+  message: string;
+  total_ajustados: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
+
 export class ApiService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8000/api'; 
 
   constructor() { }
+
+  
 
   //PROPIETARIOS
   getPropietarios(): Observable<any> {
@@ -173,22 +195,22 @@ export class ApiService {
   getDeudas(): Observable<any> {
   return this.http.get(`${this.apiUrl}/cuotas/deudas`); 
   }
-  // --- INDEXACIÓN ---
-  
   /**
-   * Obtiene la lista de contratos activos aptos para ser indexados.
-   * Corresponde a GET /api/indexaciones
-   */
-  getContratosParaIndexar(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/indexaciones`);
+     * Llama al backend para obtener una lista de contratos y cuotas que serán ajustadas.
+     * @param payload Objeto con los criterios de ajuste: { tipoAjuste, valorAjuste, fechaAplicacion }
+     * @returns Observable<PrevisualizarResponse>
+     */
+  previsualizarAjuste(payload: any): Observable<PrevisualizarResponse> {
+    return this.http.post<PrevisualizarResponse>(`${this.apiUrl}/indexacion/previsualizar`, payload);
   }
 
   /**
-   * Envía los datos del ajuste al backend para aplicar la indexación.
-   * Corresponde a POST /api/indexaciones
+   * Llama al backend para aplicar el ajuste masivo a los contratos seleccionados.
+   * @param payload Objeto con los criterios de ajuste y la lista de IDs: 
+   * { tipoAjuste, valorAjuste, fechaAplicacion, contratos_ids: number[] }
+   * @returns Observable<AplicarResponse>
    */
-  aplicarIndexacion(payload: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/indexaciones`, payload);
+  aplicarAjusteMasivo(payload: any): Observable<AplicarResponse> {
+    return this.http.post<AplicarResponse>(`${this.apiUrl}/indexacion/aplicar`, payload);
   }
-
 }

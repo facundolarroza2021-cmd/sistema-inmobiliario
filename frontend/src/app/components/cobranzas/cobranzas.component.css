@@ -108,3 +108,25 @@ tr.mat-row:hover {
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
 }
+
+/* ---------------------------------------------------------------------
+   ESTADOS CON COLORES SUAVES (SOFT COLORS)
+   --------------------------------------------------------------------- */
+/* Soporte para masculino y femenino en los estados */
+.status-pagada, .status-pagado {
+    background-color: #e8f5e9 !important; /* Verde suave */
+    color: #2e7d32 !important;
+    border: 1px solid #c8e6c9;
+}
+
+.status-pendiente {
+    background-color: #ffebee !important; /* Rojo suave */
+    color: #c62828 !important;
+    border: 1px solid #ffcdd2;
+}
+
+.status-parcial {
+    background-color: #fff3e0 !important; /* Naranja suave */
+    color: #e65100 !important;
+    border: 1px solid #ffe0b2;
+}

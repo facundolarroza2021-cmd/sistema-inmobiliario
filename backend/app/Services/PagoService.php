@@ -208,10 +208,16 @@ class PagoService
             'pago_principal' => $primerPago, 
             'contrato' => $contrato,
             'inquilino' => $contrato->inquilino,
+            'localidad' => $contrato->propiedad->localidad ?? 'No especificada',
         ]);
 
         $nombreArchivo = 'recibos_multiples/recibo_mul_' . $codigoComprobante . '.pdf';
         Storage::disk('public')->put($nombreArchivo, $pdf->output());
+
+        foreach ($pagosCreados as $pago) {
+            $pago->ruta_pdf = $nombreArchivo;
+            $pago->save();
+        }
 
         return asset('storage/' . $nombreArchivo);
     }

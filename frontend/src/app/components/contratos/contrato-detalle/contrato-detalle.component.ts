@@ -28,11 +28,11 @@ export class ContratoDetalleComponent {
 
       this.api.finalizarContrato(this.data.id).subscribe(() => {
         
-        this.mensaje.exito('Contrato finalizado correctamente');
+        this.mensaje.mostrarExito('Contrato finalizado correctamente');
         this.data.activo = 0; 
 
       }, (error) => {
-        this.mensaje.error('Error: ' + error.message);
+        this.mensaje.mostrarError('Error: ' + error.message);
       });
     }
   }

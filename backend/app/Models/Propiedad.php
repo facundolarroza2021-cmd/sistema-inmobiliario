@@ -15,6 +15,18 @@ class Propiedad extends Model
 
     protected $guarded = [];
 
+    protected $fillable = [
+        'titulo',
+        'localidad',
+        'direccion',
+        'estado',
+        'tipo',
+        'precio_alquiler',
+        'comision',
+        'disponible',
+        'propietario_id',
+    ];
+
     protected $table = 'propiedades';
 
     public function propietario(): BelongsTo

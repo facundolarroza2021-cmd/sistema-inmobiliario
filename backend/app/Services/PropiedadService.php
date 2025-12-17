@@ -52,9 +52,29 @@ class PropiedadService
         ];
     }
 
-    public function eliminarPropiedad(int $id): void
+    public function eliminarPropiedad($id)
     {
-        $propiedad = Propiedad::findOrFail($id);
-        $propiedad->delete();
+        $propiedad = \App\Models\Propiedad::findOrFail($id);
+        
+        // Solo bloqueamos si hay un contrato actualmente VIGENTE
+        $tieneContratoActivo = $propiedad->contratos()
+            ->where('activo', true)
+            ->exists();
+    
+        if ($tieneContratoActivo) {
+            throw new \Exception("No se puede eliminar: el inmueble tiene un contrato VIGENTE.");
+        }
+    
+        // Al tener SoftDeletes en el modelo, esto solo llenará 'deleted_at'
+        return $propiedad->delete();
+    }
+
+    public function actualizarPropiedad($id, array $datos)
+    {
+        $propiedad = \App\Models\Propiedad::findOrFail($id);
+        $propiedad->update($datos);
+        return $propiedad;
     }
 }
+
+

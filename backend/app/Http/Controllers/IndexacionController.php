@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\IndexacionService;
-use App\Http\Requests\AplicarAjusteRequest; // Se debe crear este Form Request
+use App\Http\Requests\AplicarAjusteRequest;
+use Illuminate\Http\Request; // Necesario para la validación manual de previsualización
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Controlador de Indexación: Interfaz HTTP para la gestión de ajustes de alquileres.
@@ -19,7 +21,7 @@ class IndexacionController extends Controller
     }
 
     /**
-     * Endpoint para listar contratos activos aptos para ajuste.
+     * Endpoint original para listar contratos activos aptos para ajuste. (GET /indexacion)
      */
     public function index()
     {
@@ -27,32 +29,66 @@ class IndexacionController extends Controller
             $this->indexacionService->listarContratosActivosParaAjuste()
         );
     }
+    
+    /**
+     * Endpoint para PREVISUALIZAR los contratos y cuotas afectadas por un ajuste masivo. (POST /indexacion/previsualizar)
+     * * @param Request $request Petición con criterios de ajuste.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function previsualizar(Request $request)
+    {
+        // Validar manualmente los criterios del filtro/ajuste
+        $validated = $request->validate([
+            'tipoAjuste' => 'required|in:porcentaje,monto_fijo',
+            'valorAjuste' => 'required|numeric|min:0.01', 
+            'fechaAplicacion' => 'required|date_format:Y-m-d', 
+        ]);
+        
+        try {
+            $contratosAjustables = $this->indexacionService->previsualizarAjuste($validated);
+
+            return response()->json([
+                'message' => 'Previsualización generada exitosamente.',
+                'contratos' => $contratosAjustables,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al previsualizar: ' . $e->getMessage()], 400);
+        }
+    }
 
     /**
-     * Aplica el ajuste (indexación) al contrato y a sus cuotas futuras.
+     * Endpoint para APLICAR el ajuste masivo a los contratos seleccionados. (POST /indexacion/aplicar)
+     * Nota: Se renombra de 'store' a 'aplicar' para mayor claridad.
      *
      * @param AplicarAjusteRequest $request Request validada por FormRequest.
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(AplicarAjusteRequest $request)
+    public function aplicar(AplicarAjusteRequest $request)
     {
+        // El FormRequest ya validó: contratos_ids, tipoAjuste, valorAjuste, fechaAplicacion.
         $validated = $request->validated();
 
         try {
-            $contrato = $this->indexacionService->aplicarAjuste(
-                $validated['contrato_id'],
-                $validated['porcentaje'] / 100, // Convertir de porcentaje a factor (25% -> 0.25)
-                Carbon::parse($validated['fecha_aplicacion']),
-                $validated['motivo']
+            $contratosAjustadosCount = $this->indexacionService->aplicarAjusteMasivo(
+                $validated['contratos_ids'],
+                $validated['tipoAjuste'],
+                $validated['valorAjuste'],
+                $validated['fechaAplicacion']
             );
 
             return response()->json([
-                'message' => 'Ajuste aplicado exitosamente.',
-                'contrato' => $contrato,
+                'message' => "Ajuste masivo aplicado exitosamente a {$contratosAjustadosCount} contratos.",
+                'total_ajustados' => $contratosAjustadosCount,
             ], 200);
 
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error al aplicar el ajuste: ' . $e->getMessage()], 400);
+            Log::error("Error en Indexación Masiva: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]); // <-- REGISTRAR EL ERROR COMPLETO
+            
+            // Devolvemos el 500 para indicarle al frontend que fue un fallo interno
+            return response()->json([
+                'message' => 'Error interno al aplicar el ajuste. Consulte los logs para el error: ' . $e->getMessage() // <-- Mensaje detallado para debug
+            ], 500);
         }
     }
 }

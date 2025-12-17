@@ -8,6 +8,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use App\DTOs\ContratoData;
 use App\Enums\ContratoEstado;
+use App\Http\Resources\ContratoResource;
 
 class ContratoService
 {
@@ -70,6 +71,8 @@ class ContratoService
         return Contrato::with(['inquilino', 'propiedad', 'garantes'])
             ->orderBy('id', 'desc')
             ->get();
+
+        return ContratoResource::collection($contratos);
     }
 
     public function finalizarContrato(int $id): void
@@ -79,7 +82,7 @@ class ContratoService
         // Usamos el Enum para finalizar
         $contrato->update([
             'estado' => ContratoEstado::FINALIZADO,
-            // 'activo' => false // Descomentar si mantienes la columna legacy por seguridad
+            'activo' => false 
         ]);
 
         // Liberamos la propiedad

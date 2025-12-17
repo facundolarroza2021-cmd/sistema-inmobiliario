@@ -51,7 +51,7 @@ export class CobroDialogComponent {
 
     // Validación básica si el monto es 0
     if (this.totalCuotas <= 0) {
-      this.mensaje.error('El monto total debe ser mayor a cero.');
+      this.mensaje.mostrarError('El monto total debe ser mayor a cero.');
       this.dialogRef.close(false);
     }
   }
@@ -62,7 +62,7 @@ export class CobroDialogComponent {
 
   procesarCobro() {
     if (this.montoFinal <= 0 || this.montoFinal > this.totalCuotas) {
-        this.mensaje.error('El monto a pagar debe ser válido y no exceder la deuda total.');
+        this.mensaje.mostrarError('El monto a pagar debe ser válido y no exceder la deuda total.');
         return;
     }
 
@@ -83,7 +83,7 @@ export class CobroDialogComponent {
         
         // Alerta de éxito con opción de PDF (como se definió en cobranzas.component.ts)
         Swal.fire({
-          title: '¡Cobro Exitoso! 💰',
+          title: '¡Cobro Exitoso! ',
           text: 'El pago múltiple se registró correctamente.',
           icon: 'success',
           showCancelButton: true,
@@ -100,7 +100,7 @@ export class CobroDialogComponent {
       error: (err) => {
         this.cargando = false;
         const msg = err.error?.message || 'Error al conectar con el servidor.';
-        this.mensaje.error(msg);
+        this.mensaje.mostrarError(msg);
       }
     });
   }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ContratoService;
 use Illuminate\Http\Request;
+use App\Services\ContratoService;
 
 class ContratoController extends Controller
 {
@@ -33,10 +33,11 @@ class ContratoController extends Controller
         ]);
 
         try {
+            // ** LÍNEA CORREGIDA: Convertir el array validado al DTO **
             $dto = \App\DTOs\ContratoData::fromArray($validated);
 
             $contrato = $this->contratoService->crearContratoCompleto(
-                $dto, 
+                $dto, // <-- AHORA PASAMOS EL OBJETO DTO
                 $request->file('archivo')
             );
 
@@ -54,7 +55,6 @@ class ContratoController extends Controller
     {
         try {
             $this->contratoService->finalizarContrato($id);
-
             return response()->json(['message' => 'Contrato finalizado correctamente']);
         } catch (\Exception $e) {
             return response()->json(['message' => 'No se pudo finalizar el contrato'], 404);

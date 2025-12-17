@@ -76,10 +76,10 @@ export class InquilinosComponent implements OnInit {
   eliminar(inquilino: any) {
     if(confirm(`¿Estás seguro de eliminar a ${inquilino.nombre_completo}?`)) {
       this.api.eliminarInquilino(inquilino.id).subscribe(() => {
-        this.mensaje.exito('Inquilino eliminado correctamente');
+        this.mensaje.mostrarExito('Inquilino eliminado correctamente');
         this.cargarDatos();
       }, (err) => {
-        this.mensaje.error('No se puede eliminar (quizás tiene contratos activos)');
+        this.mensaje.mostrarError('No se puede eliminar (quizás tiene contratos activos)');
       });
     }
   }

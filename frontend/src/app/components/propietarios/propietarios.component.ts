@@ -57,11 +57,11 @@ export class PropietariosComponent implements OnInit {
     if(confirm(`¿Estás seguro de eliminar a ${propietario.nombre}?`)) { 
       this.api.eliminarPropietario(propietario.id).subscribe({
         next: () => {
-          this.mensaje.exito('Propietario eliminado');
+          this.mensaje.mostrarExito('Propietario eliminado');
           this.cargarDatos();
         },
         error: (err) => {
-          this.mensaje.error('No se puede eliminar (¿Tiene propiedades asociadas?)');
+          this.mensaje.mostrarError('No se puede eliminar (¿Tiene propiedades asociadas?)');
         }
       });
     }

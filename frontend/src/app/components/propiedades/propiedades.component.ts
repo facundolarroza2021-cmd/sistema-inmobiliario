@@ -92,14 +92,23 @@ export class PropiedadesComponent implements OnInit {
     });
   }
 
-  // FUNCIÓN ELIMINAR
-  eliminar(propiedad: any) {
-    if(confirm(`¿Borrar la propiedad "${propiedad.direccion}"?`)) {
-      this.api.eliminarPropiedad(propiedad.id).subscribe(() => {
-        this.mensaje.exito('Propiedad eliminada');
-        this.cargarDatos();
-      }, (err) => {
-        this.mensaje.error('Error al eliminar');
+  async eliminar(propiedad: any) {
+    // 1. Llamamos a la alerta de confirmación
+    const resultado = await this.mensaje.confirmarEliminacion(
+      '¿Eliminar Propiedad?',
+      `Estás por borrar el inmueble en ${propiedad.direccion}.`
+    );
+
+    // 2. Si el usuario confirmó (le dio al botón fucsia)
+    if (resultado.isConfirmed) {
+      this.api.eliminarPropiedad(propiedad.id).subscribe({
+        next: () => {
+          this.mensaje.mostrarExito('La propiedad ha sido borrada.');
+          this.cargarDatos(); // Recarga la tabla
+        },
+        error: (err) => {
+          this.mensaje.mostrarError('No se pudo eliminar. Es posible que tenga contratos activos.');
+        }
       });
     }
   }

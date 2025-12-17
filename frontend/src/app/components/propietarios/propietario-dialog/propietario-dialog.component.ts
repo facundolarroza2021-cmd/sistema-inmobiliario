@@ -19,9 +19,14 @@ import { ApiService } from '../../../services/api.service';
 export class PropietarioDialogComponent implements OnInit {
   private mensaje = inject(MensajeService);
   private api = inject(ApiService);   
-  // Objeto temporal
-  nuevoPropietario = {
-    nombre_completo: '', dni: '', email: '', telefono: '', cbu: ''
+  
+  nuevoPropietario = { 
+    nombre_completo: '', 
+    dni: '', 
+    email: '', 
+    telefono: '', 
+    direccion: '',
+    cbu: null
   };
 
   constructor(
@@ -29,46 +34,36 @@ export class PropietarioDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any // Aquí recibiríamos datos si fuera para editar
   ) {}
 
-  guardar() {
-      // Validar campos básicos
-      if (!this.nuevoPropietario.nombre_completo || !this.nuevoPropietario.dni) {
-        this.mensaje.error('Nombre y DNI son obligatorios');
-        return;
-      }
-
-      // --- CORRECCIÓN: Forzamos que el DNI sea String ---
-      const datosParaEnviar = {
-        ...this.nuevoPropietario,
-        dni: this.nuevoPropietario.dni.toString() // <--- ¡Esto soluciona el error!
-      };
-
-      if (this.data) {
-        // --- LÓGICA DE EDICIÓN ---
-        // Usamos datosParaEnviar en lugar de this.nuevoPropietario
-        this.api.editarPropietario(this.data.id, datosParaEnviar).subscribe({
-          next: () => {
-            this.mensaje.exito('Propietario actualizado');
-            this.dialogRef.close(true); 
-          },
-          error: (err) => this.mensaje.error('Error al actualizar (¿DNI duplicado?)')
-        });
-
-      } else {
-        // --- LÓGICA DE CREACIÓN ---
-        // Usamos datosParaEnviar
-        this.api.crearPropietario(datosParaEnviar).subscribe({
-          next: () => {
-            this.mensaje.exito('Propietario creado');
-            this.dialogRef.close(true);
-          },
-          error: () => this.mensaje.error('Error al crear')
-        });
-      }
-    }
-
-  ngOnInit(): void {
+  ngOnInit() {
     if (this.data) {
-      this.nuevoPropietario = { ...this.data }; // Si es para editar, copiamos los datos
+      // MAPEAMOS los datos de la tabla a lo que el Backend requiere para validar
+      this.nuevoPropietario = { 
+        ...this.data,
+        nombre_completo: this.data.nombre,        // 'nombre' de la tabla -> 'nombre_completo' del backend
+        dni: this.data.identificacion,           // 'identificacion' de la tabla -> 'dni' del backend
+        email: this.data.contacto?.email || ''   // Extraemos el email si viene anidado
+      }; 
+    }
+  }
+
+  guardar() {
+    if (this.data && this.data.id) {
+      // IMPORTANTE: Laravel a veces requiere _method: 'PUT' si envías como POST
+      // o simplemente usa el método editarPropietario que definimos en api.php
+      this.api.editarPropietario(this.data.id, this.nuevoPropietario).subscribe({
+        next: () => {
+          this.mensaje.mostrarExito('Propietario actualizado correctamente');
+          this.dialogRef.close(true);
+        },
+        error: (err) => this.mensaje.mostrarError('Error al actualizar')
+      });
+    } else {
+      this.api.crearPropietario(this.nuevoPropietario).subscribe({
+        next: () => {
+          this.mensaje.mostrarExito('Propietario registrado');
+          this.dialogRef.close(true);
+        }
+      });
     }
   }
 }

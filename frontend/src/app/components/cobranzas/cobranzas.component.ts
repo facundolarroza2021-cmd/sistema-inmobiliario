@@ -18,7 +18,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip'; // Añadido
 import { MatDialog } from '@angular/material/dialog';
 import { CobroDialogComponent } from './cobro-dialog/cobro-dialog.component';
-import Swal from 'sweetalert2';
+import { Title } from '@angular/platform-browser';
 import { EventosService } from '../../services/eventos.service';
 
 @Component({
@@ -37,7 +37,7 @@ export class CobranzasComponent implements OnInit {
   private api = inject(ApiService);
   private mensaje = inject(MensajeService);
   private dialog = inject(MatDialog); // Inyección del Dialog
-  
+  private title = inject(Title);
 
   private eventosService = inject(EventosService);
 
@@ -53,11 +53,12 @@ export class CobranzasComponent implements OnInit {
   ngOnInit() {
     this.cargarDeudas(); // Carga inicial
     this.suscribirAEventos(); // <-- Añadir suscripción
+    this.title.setTitle('Gestion | Cobranzas');
   }
 
   suscribirAEventos() {
     this.eventosService.cuotasActualizadas$.subscribe(() => {
-      this.mensaje.exito('El listado de deudas se ha actualizado automáticamente.');
+      this.mensaje.mostrarExito('El listado de deudas se ha actualizado automáticamente.');
       this.cargarDeudas(); // Llama a la función que refresca la lista de cuotas desde la API
     });
   }
@@ -71,44 +72,54 @@ export class CobranzasComponent implements OnInit {
    * Carga todas las cuotas pendientes desde el backend y las procesa.
    * Es la función principal de recarga de datos.
    */
+  // En cargarDeudas()
   cargarDeudas() {
     this.cargando = true;
     this.selection.clear();
 
     this.api.getDeudas().subscribe({
         next: (res: any) => {
-            
-            const datosBrutos = res.data || res; 
-
+            const datosBrutos = res.data || res;
             if (!datosBrutos || !Array.isArray(datosBrutos)) {
                 this.dataSource.data = [];
                 this.cargando = false;
                 return;
             }
 
-            const deudasProcesadas = datosBrutos.map((item: any) => ({
+            // Procesamos datos y mejoramos el filtro interno de MatTable
+            this.dataSource.data = datosBrutos.map((item: any) => ({
                 ...item,
-                saldo_pendiente: parseFloat(item.saldo_pendiente) || 0 
+                saldo_pendiente: parseFloat(item.saldo_pendiente) || 0
             }));
-            
-            this.dataSource.data = deudasProcesadas;
+
+            // Personalización del filtro para buscar por inquilino, dirección o periodo
+            this.dataSource.filterPredicate = (data: any, filter: string) => {
+                const nombre = data.contrato?.inquilino?.nombre_completo?.toLowerCase() || '';
+                const direccion = data.contrato?.propiedad?.direccion?.toLowerCase() || '';
+                const periodo = data.periodo?.toLowerCase() || '';
+                return nombre.includes(filter) || direccion.includes(filter) || periodo.includes(filter);
+            };
+
             this.cargando = false;
-        
-            if (this.paginator) {
-                this.dataSource.paginator = this.paginator;
-            }
-            if (this.sort) {
-                this.dataSource.sort = this.sort;
-            }
         },
         error: (err) => {
-            this.mensaje.error('No se pudieron cargar las deudas pendientes. Intente más tarde.');
+            this.mensaje.mostrarError('Error al cargar datos.');
             this.cargando = false;
-            this.dataSource.data = [];
-            console.error(err);
         }
     });
-}
+  }
+
+  // En toggleAllRows()
+  toggleAllRows() {
+    if (this.isAllSelected()) {
+        this.selection.clear();
+    } else {
+        // Ahora permitimos seleccionar tanto PENDIENTES como PARCIALES para cobrar
+        this.dataSource.data
+            .filter(row => row.estado !== 'PAGADA')
+            .forEach(row => this.selection.select(row));
+    }
+  }
   
 
   aplicarFiltro(event: Event) {
@@ -129,15 +140,6 @@ export class CobranzasComponent implements OnInit {
     return numSelected === numRows;
   }
 
-  toggleAllRows() {
-    if (this.isAllSelected()) {
-      this.selection.clear();
-    } else {
-      // Selecciona solo las cuotas que NO están PAGADAS
-      this.dataSource.data.filter(row => row.estado !== 'PAGADA').forEach(row => this.selection.select(row));
-    }
-  }
-  
   /** * FIX NG5002: Esta función calcula el total. 
    * La llamamos desde el HTML para evitar el error de parseo. 
    */
@@ -171,15 +173,17 @@ export class CobranzasComponent implements OnInit {
 
   verComprobante(cuota: any) {
     if (cuota.pagos && cuota.pagos.length > 0) {
-      const ultimoPago = cuota.pagos[cuota.pagos.length - 1];
-
-      if (ultimoPago.ruta_pdf) {
-        // Asegúrate que esta URL coincida con tu backend
-        const url = `http://localhost:8000/storage/${ultimoPago.ruta_pdf}`;
-        window.open(url, '_blank');
-      } else {
-        this.mensaje.error('Esta cuota no tiene un comprobante PDF asociado.');
-      }
+        // Obtenemos el último pago del array
+        const ultimoPago = cuota.pagos[cuota.pagos.length - 1];
+        
+        if (ultimoPago.ruta_pdf) {
+            const url = `http://localhost:8000/storage/${ultimoPago.ruta_pdf}`;
+            window.open(url, '_blank');
+        } else {
+            this.mensaje.mostrarError('El comprobante PDF no existe para este pago.');
+        }
+    } else {
+        this.mensaje.mostrarError('No se encontraron registros de pago asociados.');
     }
-  }
+}
 }

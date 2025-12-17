@@ -7,71 +7,141 @@ use App\Models\Cuota;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Exception;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Servicio de Indexación: Gestiona la aplicación de ajustes inflacionarios o porcentuales
- * a las cuotas futuras de un contrato.
+ * a las cuotas futuras de uno o varios contratos.
  */
 class IndexacionService
 {
     /**
-     * Aplica un aumento porcentual al monto de alquiler de un contrato y actualiza las cuotas futuras.
-     *
-     * @param int $contratoId ID del contrato a ajustar.
-     * @param float $porcentajeAumento El porcentaje de aumento a aplicar (ej: 0.25 para 25%).
-     * @param Carbon $fechaAplicacion Fecha a partir de la cual se aplica el nuevo monto.
-     * @param string $motivo Razón del ajuste (ej: 'INDEC', 'Acuerdo Propietario').
-     * @return Contrato El contrato actualizado.
-     * @throws Exception Si el contrato no existe o el porcentaje no es válido.
+     * Previsualiza los contratos y cuotas que se verán afectados por el ajuste.
+     * * @param array $datos ['tipoAjuste', 'valorAjuste', 'fechaAplicacion']
+     * @return Collection
      */
-    public function aplicarAjuste(int $contratoId, float $porcentajeAumento, Carbon $fechaAplicacion, string $motivo): Contrato
+    public function previsualizarAjuste(array $datos): Collection
     {
-        if ($porcentajeAumento <= 0) {
-            throw new Exception("El porcentaje de aumento debe ser positivo.");
+        $fechaAplicacion = Carbon::parse($datos['fechaAplicacion'])->format('Y-m');
+        $valorAjuste = $datos['valorAjuste'];
+        $tipoAjuste = $datos['tipoAjuste'];
+
+        // 1. Obtener contratos activos con información necesaria para la vista previa
+        $contratos = Contrato::with('inquilino', 'propiedad') // Incluimos Propiedad e Inquilino
+            ->where('estado', \App\Enums\ContratoEstado::ACTIVO)
+            ->get();
+        
+        $contratosAjustables = collect();
+
+        foreach ($contratos as $contrato) {
+            // 2. Contar cuotas futuras pendientes afectadas
+            // Excluímos 'PAGADO' y 'LIQUIDADO' para evitar modificar cuotas cerradas
+            $cuotasAfectadasCount = Cuota::where('contrato_id', $contrato->id)
+                ->where('periodo', '>=', $fechaAplicacion)
+                ->whereNotIn('estado', ['PAGADO', 'LIQUIDADO']) 
+                ->count();
+            
+            // Solo agregar si hay cuotas que ajustar
+            if ($cuotasAfectadasCount > 0) {
+                $montoActual = $contrato->monto_alquiler;
+                $nuevoMonto = $this->calcularNuevoMonto($montoActual, $tipoAjuste, $valorAjuste);
+
+                $contratosAjustables->push([
+                    'id' => $contrato->id,
+                    'inquilino' => $contrato->inquilino,
+                    'propiedad' => $contrato->propiedad,
+                    'monto_alquiler' => $montoActual,
+                    'nuevo_monto_alquiler' => $nuevoMonto,
+                    'cuotas_afectadas' => $cuotasAfectadasCount,
+                ]);
+            }
         }
 
-        return DB::transaction(function () use ($contratoId, $porcentajeAumento, $fechaAplicacion, $motivo) {
-            
-            $contrato = Contrato::lockForUpdate()->findOrFail($contratoId);
+        return $contratosAjustables;
+    }
 
-            // 1. Calcular el nuevo monto de alquiler
-            $montoActual = $contrato->monto_alquiler;
-            $nuevoMonto = $montoActual * (1 + $porcentajeAumento);
-            
-            // 2. Actualizar el monto base del contrato
-            $contrato->monto_alquiler = $nuevoMonto;
-            // Se puede agregar un campo 'ultima_indexacion_fecha' y 'ultima_indexacion_motivo' al modelo Contrato.
-            $contrato->save();
+    /**
+     * Aplica un ajuste de monto a un conjunto de contratos y actualiza sus cuotas futuras.
+     * * @param array $contratoIds IDs de los contratos a ajustar.
+     * @param string $tipoAjuste 'porcentaje' o 'monto_fijo'.
+     * @param float $valorAjuste El valor del ajuste (ej: 10 para 10% o 1000 para $1000).
+     * @param string $fechaAplicacion Fecha (YYYY-MM-DD) a partir de la cual se aplica el nuevo monto.
+     * @return int El número de contratos ajustados exitosamente.
+     * @throws Exception Si el valor de ajuste no es válido.
+     */
+    public function aplicarAjusteMasivo(array $contratoIds, string $tipoAjuste, float $valorAjuste, string $fechaAplicacion): int
+    {
+        if ($valorAjuste <= 0) {
+            throw new Exception("El valor de ajuste debe ser positivo.");
+        }
 
-            // 3. Identificar y actualizar cuotas futuras (Indexación de Cuotas)
-            // Se actualizan todas las cuotas que aún no han sido PAGADAS y cuyo período es
-            // igual o posterior a la fecha de aplicación.
-            $cuotasAfectadas = Cuota::where('contrato_id', $contratoId)
-                ->where('periodo', '>=', $fechaAplicacion->format('Y-m'))
-                ->whereNotIn('estado', ['PAGADO']) // No actualizar cuotas ya pagadas
+        $fechaAplicacionCarbon = Carbon::parse($fechaAplicacion);
+        $fechaAplicacionPeriodo = $fechaAplicacionCarbon->format('Y-m');
+        $contratosAjustadosCount = 0;
+
+        return DB::transaction(function () use ($contratoIds, $tipoAjuste, $valorAjuste, $fechaAplicacionPeriodo, &$contratosAjustadosCount) {
+            
+            $contratos = Contrato::whereIn('id', $contratoIds)
+                ->where('estado', \App\Enums\ContratoEstado::ACTIVO)
+                ->lockForUpdate()
                 ->get();
 
-            $cuotasAfectadas->each(function (Cuota $cuota) use ($montoActual, $nuevoMonto, $motivo) {
-                // El aumento solo se aplica al IMPORTE BASE de la cuota.
-                $diferencia = $nuevoMonto - $montoActual; 
+            foreach ($contratos as $contrato) {
+                $montoActual = $contrato->monto_alquiler;
+                $nuevoMonto = $this->calcularNuevoMonto($montoActual, $tipoAjuste, $valorAjuste);
+                $diferencia = $nuevoMonto - $montoActual;
                 
-                $cuota->importe = $nuevoMonto; // Nuevo canon base
-                $cuota->saldo_pendiente += $diferencia; 
-                
-                $cuota->notas = "Ajuste aplicado: {$motivo} ({$diferencia})";
-                
-                $cuota->save();
-            });
+                if ($diferencia <= 0.009) {
+                    continue; 
+                }
 
-            return $contrato;
+                // 1. Actualizar el monto base del contrato
+                $contrato->monto_alquiler = $nuevoMonto;
+                $contrato->save();
+
+                // 2. Identificar y actualizar cuotas futuras
+                $cuotasAfectadas = Cuota::where('contrato_id', $contrato->id)
+                    ->where('periodo', '>=', $fechaAplicacionPeriodo)
+                    ->whereNotIn('estado', ['PAGADO', 'LIQUIDADO']) 
+                    ->get();
+
+                $motivo = "Ajuste Masivo de {$tipoAjuste} ({$valorAjuste}). Nuevo monto base: {$nuevoMonto}";
+
+                $cuotasAfectadas->each(function (Cuota $cuota) use ($nuevoMonto, $diferencia, $motivo) {
+                    // *** CORRECCIÓN: Usar monto_original en lugar de importe ***
+                    $cuota->monto_original = $nuevoMonto; 
+                    $cuota->saldo_pendiente = $cuota->saldo_pendiente + $diferencia; 
+                    
+                    // Asumiendo que 'notas' existe en el modelo Cuota
+                    // Nota: Si 'notas' no existe, esto podría causar otro error
+                    //if (property_exists($cuota, 'notas')) {
+                      //  $cuota->notas .= " | {$motivo}";
+                    //}
+                    
+                    $cuota->save();
+                });
+                $contratosAjustadosCount++;
+            }
+            Log::info("DEBUG INDEXACION: Finalizando transacción. Total ajustados: {$contratosAjustadosCount}");
+            return $contratosAjustadosCount;
         });
     }
 
     /**
-     * Lista contratos activos que son aptos para indexación (ej. aquellos que han cumplido 6 o 12 meses).
-     * Nota: Por simplicidad, lista solo activos. La lógica de aptitud por fecha es del Frontend/Reporting.
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Función utilitaria para calcular el nuevo monto base.
      */
+    protected function calcularNuevoMonto(float $montoActual, string $tipoAjuste, float $valorAjuste): float
+    {
+        if ($tipoAjuste === 'porcentaje') {
+            return round($montoActual * (1 + $valorAjuste / 100), 2);
+        } elseif ($tipoAjuste === 'monto_fijo') {
+            return round($montoActual + $valorAjuste, 2);
+        }
+        return $montoActual;
+    }
+    
+    // El método listarContratosActivosParaAjuste() se mantiene igual
     public function listarContratosActivosParaAjuste()
     {
         return Contrato::with('inquilino', 'propiedad')
